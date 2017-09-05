@@ -15,6 +15,26 @@ OFFSET = []
 for i in range(3*(2*SIDE_OFFSET + ZONE_WIDTH)):
 	OFFSET.append(99)
 
+#Pieces Definition
+SHAPE_T = [[0,0,0,0,0], [0,1,1,1,0], [0,0,1,0,0], [0,0,0,0,0], [0,0,0,0,0]]
+SHAPE_S = [[0,0,0,0,0], [0,0,1,1,0], [0,1,1,0,0], [0,0,0,0,0], [0,0,0,0,0]]
+SHAPE_Z = [[0,0,0,0,0], [0,1,1,0,0], [0,0,1,1,0], [0,0,0,0,0], [0,0,0,0,0]]
+SHAPE_J = [[0,0,0,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,1,1,0,0], [0,0,0,0,0]]
+SHAPE_L = [[0,0,0,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,1,0], [0,0,0,0,0]]
+SHAPE_O = [[0,0,0,0,0], [0,1,1,0,0], [0,1,1,0,0], [0,0,0,0,0], [0,0,0,0,0]]
+SHAPE_I = [[0,0,0,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0]]
+
+SHAPES = [SHAPE_T, SHAPE_S, SHAPE_Z, SHAPE_J, SHAPE_L, SHAPE_O, SHAPE_I]
+NAMES = ['T', 'S', 'Z', 'J', 'L', 'O', 'I']
+
+class falling_block(object):
+	def __init__(self):
+		self.name = None
+		self.shape = None
+		self.x = None
+		self.y = None
+
+
 def createMatrix(n,m):
 	"""Creates matrix to be used as container of blocks"""
 	matrix = []
@@ -57,9 +77,9 @@ def drawMatrix(window, matrix, color):
 			#Render walls as gray
 			if matrix[i][j] == 99:
 				pygame.draw.rect(window, (128,128,128,0),(j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),0)
-			elif matrix[i][j]
-				pass
-			pass
+			#elif matrix[i][j]:
+			#	pygam
+		pass
 
 def showMatrix(matrix): 
 	"""Prints a matrix to console for debug"""
