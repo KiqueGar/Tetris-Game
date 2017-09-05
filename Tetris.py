@@ -20,13 +20,6 @@ def joinMatrix(matrix1, matrix2):
 		print ("joinMatrix: Matrices must be of same height!")
 		return matrix1
 	new_matrix=[]
-	"""
-	for i in range(len(matrix1)):
-		new_col = matrix1[i]
-		new_col.append(99)
-		new_col.extend(matrix2[i])
-		new_matrix.append(new_col)
-	"""
 	for i in range(len(matrix1)):
 		new_row = matrix1[i].copy()
 		new_row.append(99)

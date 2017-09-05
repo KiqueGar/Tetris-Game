@@ -1,0 +1,19 @@
+### TODO's:
+
+[x] Create_Canvas
+	[ ] Draw_canvas
+[ ] Create_Pieces
+[ ] Coordinate_moves
+	[ ] Rotate pieces
+[ ] Remove completed row
+	[ ] Do not remove if not same color
+	[ ] Fall pieces down
+[ ] Show Score
+[ ] 
+[ ] 
+[ ] 
+[ ] 
+[ ] 
+[ ] 
+
+
