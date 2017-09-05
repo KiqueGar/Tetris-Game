@@ -4,13 +4,14 @@ from pygame.locals import*
 
 from random import randint 
 
-BLOCK_SIZE = 15
-TOP_BOTTOM_OFFSET=1
-SIDE_OFFSET = 1
-ZONE_HEIGHT = 30
-ZONE_WIDTH =10
+#Canvas properties
+BLOCK_SIZE = 15		# Pixel size of blocks 
+TOP_BOTTOM_OFFSET=1	# Top and bottom blocks to render as "wall"
+SIDE_OFFSET = 1		# "wall" width of gamezones
+ZONE_HEIGHT = 30	# Total height of gamezone
+ZONE_WIDTH =10		# Total width of gamezone
 OFFSET = []
-#Build bottom/top offset
+#Build bottom/top walls
 for i in range(3*(2*SIDE_OFFSET + ZONE_WIDTH)):
 	OFFSET.append(99)
 
@@ -23,29 +24,40 @@ def createMatrix(n,m):
 			matrix[i].append(0)
 	return matrix
 
-def joinMatrix(matrix1, matrix2):
-	"""Appends colums of matrix 2 to matrix 1, inserts separators inside"""
-	if len(matrix1)!=len(matrix2):
+def joinMatrix(matrix1, matrix2, matrix3):
+	"""Appends gamezones, inserts separators between zones"""
+	if (len(matrix1)!=len(matrix2) or len(matrix1)!=len(matrix3)):
 		print ("joinMatrix: Matrices must be of same height!")
 		return matrix1
 	new_matrix=[]
-	last_index= len(new_matrix) +1
 	for i in range(len(matrix1)):
-		new_row = matrix1[i].copy()
-		new_row.append(99)
-		new_row.extend(matrix2[i])
+		new_row = matrix1[i].copy()		#Insert Zone1
+		for j in range(SIDE_OFFSET):	#Add walls Zone 1
+			new_row.insert(0,99)
+			new_row.append(99)
+		for j in range(SIDE_OFFSET):	#Add left walls of zone 2
+			new_row.append(99)
+		new_row.extend(matrix2[i])		#Add Zone 2
+		for j in range(SIDE_OFFSET):	#Add double wall between zones
+			new_row.append(99)
+			new_row.append(99)
+		new_row.extend(matrix3[i])		#Add zone 3
+		for j in range(SIDE_OFFSET):	#Add remaining wall
+			new_row.append(99)
 		new_matrix.append(new_row)
-	#for i in range(TOP_BOTTOM_OFFSET):
-	#	new_matrix.insert(0, OFFSET)
-	#	new_matrix.append(OFFSET)
+	for i in range(TOP_BOTTOM_OFFSET):	#Add floor and ceil
+		new_matrix.insert(0, OFFSET)
+		new_matrix.append(OFFSET)
 	return new_matrix
 
-def drawMatrix(window, matrix, color =[128,0,128]):
+def drawMatrix(window, matrix, color):
+	"""Renders gamescreen"""
 	for i in range(len(matrix)):
 		for j in range(len(matrix[0])):
 			#Render walls as gray
 			if matrix[i][j] == 99:
-				pygame.draw.rect(window, (128, 128, 128,0),(j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),0)
+				pygame.draw.rect(window, (128,128,128,0),(j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),0)
+			elif matrix[i][j]
 				pass
 			pass
 
@@ -56,7 +68,7 @@ def showMatrix(matrix):
 
 
 def mainWindow():
-	window = pygame.display.set_mode((600,500))
+	window = pygame.display.set_mode((800,600))
 
 
 	while True:
@@ -64,7 +76,7 @@ def mainWindow():
 		zone1 = createMatrix(ZONE_HEIGHT,ZONE_WIDTH)
 		zone2 = createMatrix(ZONE_HEIGHT,ZONE_WIDTH)
 		zone3 = createMatrix(ZONE_HEIGHT,ZONE_WIDTH)
-		toRender = joinMatrix(joinMatrix(zone1,zone2),zone3)
+		toRender = joinMatrix(zone1,zone2,zone3)
 		drawMatrix(window, toRender, [128,128,128])
 		#showMatrix(toRender)
 		for events in pygame.event.get():

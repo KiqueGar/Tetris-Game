@@ -1,7 +1,7 @@
 ### TODO's:
 
 [x] Create_Canvas
-	[ ] Draw_canvas
+	[x] Draw_canvas
 [ ] Create_Pieces
 [ ] Coordinate_moves
 	[ ] Rotate pieces
