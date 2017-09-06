@@ -31,6 +31,8 @@ SHAPE_I = [[0,0,0,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0]]
 SHAPES = [SHAPE_T, SHAPE_S, SHAPE_Z, SHAPE_J, SHAPE_L, SHAPE_O, SHAPE_I]
 NAMES = ['T', 'S', 'Z', 'J', 'L', 'O', 'I']
 
+FALLING_OBJECT=False
+
 class falling_block(object):
 	"""Falling Object Class"""
 	def __init__(self):
@@ -58,6 +60,23 @@ class falling_block(object):
 		"""Changes game zone"""
 		self.zone = (zelf.zone+1)%3
 
+class gameZone(object):
+	"""Game Zone object"""
+	def __init__(self):
+		self.height = ZONE_HEIGHT
+		self.width = ZONE_HEIGHT
+		self.space = None
+
+def createZones():
+	"""Creates 3 gameZone objects, return them in array"""
+	zone1 = gameZone()
+	zone1.space = createMatrix(ZONE_HEIGHT,ZONE_WIDTH)
+	zone2 = gameZone()
+	zone2.space = createMatrix(ZONE_HEIGHT,ZONE_WIDTH)
+	zone3 = gameZone()
+	zone3.space = createMatrix(ZONE_HEIGHT,ZONE_WIDTH)
+
+	return [zone1, zone2, zone3]
 
 def create_block():
 	"""Creates a falling object object"""
@@ -115,9 +134,16 @@ def drawMatrix(window, matrix, color):
 			#Render walls as gray
 			if matrix[i][j] == 99:
 				pygame.draw.rect(window, (128,128,128,0),(j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),0)
-			#elif matrix[i][j]:
+			#elif matrix[i][j] == 1:
 			#	pygam
 		pass
+
+def evaluateGame(falling_block, zones):
+	if FALLING_OBJECT:
+		print("Here goes the code for overlay block into area")
+		return joinMatrix(zones[0].space,zones[1].space,zones[2].space)
+	else:
+		return joinMatrix(zones[0].space,zones[1].space,zones[2].space)
 
 def showMatrix(matrix): 
 	"""Prints a matrix to console for debug"""
@@ -132,17 +158,17 @@ def blockStatus(block):
 	print([block.x, block.y])
 
 def mainWindow():
+	global FALLING_OBJECT
 	window = pygame.display.set_mode((800,600))
-
+	zones=createZones();	#Create Board to play in
+	falling = None
 
 	while True:
 		window.fill((0,0,0))
-		zone1 = createMatrix(ZONE_HEIGHT,ZONE_WIDTH)
-		zone2 = createMatrix(ZONE_HEIGHT,ZONE_WIDTH)
-		zone3 = createMatrix(ZONE_HEIGHT,ZONE_WIDTH)
-		toRender = joinMatrix(zone1,zone2,zone3)
-		drawMatrix(window, toRender, [128,128,128])
-		#showMatrix(toRender)
+		#toRender = joinMatrix(zones)
+		#drawMatrix(window, toRender, [128,128,128])
+		toRender = evaluateGame(falling, zones)
+		drawMatrix(window, toRender, RED)
 		for events in pygame.event.get():
 			if events.type == QUIT:
 				pygame.quit()
@@ -163,6 +189,7 @@ def mainWindow():
 				if events.key==K_RETURN:
 					print ("ENTER")
 					falling = create_block()
+					FALLING_OBJECT = True
 					blockStatus(falling)
 				if events.key==K_DOWN:
 					print ("v")
