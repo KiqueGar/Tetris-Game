@@ -2,7 +2,7 @@ import pygame,sys,time
 
 from pygame.locals import* 
 
-from random import randint 
+import random
 
 #Canvas properties
 BLOCK_SIZE = 15		# Pixel size of blocks 
@@ -14,7 +14,11 @@ OFFSET = []
 #Build bottom/top walls
 for i in range(3*(2*SIDE_OFFSET + ZONE_WIDTH)):
 	OFFSET.append(99)
-
+#Color definitions
+BLUE = [66,154,223]
+RED = [205, 30, 16]
+YELLOW =[241,171,0]
+COLORS=[BLUE, RED, YELLOW]
 #Pieces Definition
 SHAPE_T = [[0,0,0,0,0], [0,1,1,1,0], [0,0,1,0,0], [0,0,0,0,0], [0,0,0,0,0]]
 SHAPE_S = [[0,0,0,0,0], [0,0,1,1,0], [0,1,1,0,0], [0,0,0,0,0], [0,0,0,0,0]]
@@ -28,11 +32,45 @@ SHAPES = [SHAPE_T, SHAPE_S, SHAPE_Z, SHAPE_J, SHAPE_L, SHAPE_O, SHAPE_I]
 NAMES = ['T', 'S', 'Z', 'J', 'L', 'O', 'I']
 
 class falling_block(object):
+	"""Falling Object Class"""
 	def __init__(self):
 		self.name = None
 		self.shape = None
-		self.x = None
-		self.y = None
+		self.x = None		# X coordinate is from top to bottom
+		self.y = None		# Y Cordinate is from left to right
+		self.color = None
+		self.zone = None
+
+	def rotate(self):
+		"""Rotates block"""
+		rotated = list(zip(*self.shape[::-1]))
+		self.shape = rotated
+
+	def move(self, dir):
+		"""Moves block sideways"""
+		pass
+
+	def fall(self):
+		"""Falls block 1 space"""
+		self.x+=1
+
+	def changeZone(self):
+		"""Changes game zone"""
+		self.zone = (zelf.zone+1)%3
+
+
+def create_block():
+	"""Creates a falling object object"""
+	name = random.randint(0,len(NAMES)-1)	#Select randomly a piece
+	block = falling_block()
+	block.name = NAMES[name]
+	block.shape = SHAPES[name]
+	block.color = random.choice(COLORS)
+	block.zone = 1
+	block.x = -1
+	block.y = 3
+	return block
+
 
 
 def createMatrix(n,m):
@@ -86,6 +124,12 @@ def showMatrix(matrix):
 	for i in range(len(matrix)):
 		print(matrix[i]) 
 
+def blockStatus(block):
+	"""Prints to console data about block object"""
+	print(block.name)
+	print(block.color)
+	showMatrix(block.shape)
+	print([block.x, block.y])
 
 def mainWindow():
 	window = pygame.display.set_mode((800,600))
@@ -105,18 +149,25 @@ def mainWindow():
 				sys.exit()
 			elif events.type == KEYDOWN:
 				if events.key==K_UP:
-					print ("Up") 
+					print ("^")
+					falling.rotate()
+					blockStatus(falling)
 				if events.key==K_LEFT:
-					print ("Left") 
+					print ("<")
+					falling.move(-1)
+					blockStatus(falling)
 				if events.key==K_RIGHT:
-					print ("Right") 
+					print (">")
+					falling.move(1)
+					blockStatus(falling)
 				if events.key==K_RETURN:
-					print ("ENTER") 
+					print ("ENTER")
+					falling = create_block()
+					blockStatus(falling)
 				if events.key==K_DOWN:
-					print ("Down") 
-
-
-
+					print ("v")
+					falling.fall();
+					blockStatus(falling)
 
 		pygame.display.update()
 		time.sleep(.04)
