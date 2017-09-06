@@ -1,4 +1,4 @@
-import pygame,sys,time
+import pygame,sys,time, copy
 
 from pygame.locals import* 
 
@@ -45,6 +45,7 @@ class falling_block(object):
 
 	def rotate(self):
 		"""Rotates block"""
+		if self.name== 'O': return
 		rotated = list(zip(*self.shape[::-1]))
 		self.shape = rotated
 
@@ -58,7 +59,7 @@ class falling_block(object):
 
 	def changeZone(self):
 		"""Changes game zone"""
-		self.zone = (zelf.zone+1)%3
+		self.zone = (self.zone+1)%3
 
 class gameZone(object):
 	"""Game Zone object"""
@@ -114,11 +115,11 @@ def joinMatrix(matrix1, matrix2, matrix3):
 			new_row.append(99)
 		for j in range(SIDE_OFFSET):	#Add left walls of zone 2
 			new_row.append(99)
-		new_row.extend(matrix2[i])		#Add Zone 2
+		new_row.extend(matrix2[i].copy())		#Add Zone 2
 		for j in range(SIDE_OFFSET):	#Add double wall between zones
 			new_row.append(99)
 			new_row.append(99)
-		new_row.extend(matrix3[i])		#Add zone 3
+		new_row.extend(matrix3[i].copy())		#Add zone 3
 		for j in range(SIDE_OFFSET):	#Add remaining wall
 			new_row.append(99)
 		new_matrix.append(new_row)
@@ -134,14 +135,50 @@ def drawMatrix(window, matrix, color):
 			#Render walls as gray
 			if matrix[i][j] == 99:
 				pygame.draw.rect(window, (128,128,128,0),(j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),0)
-			#elif matrix[i][j] == 1:
-			#	pygam
+			elif matrix[i][j] == 10:	#Render as blue
+				pygame.draw.rect(window, (BLUE[0],BLUE[1],BLUE[2],0),(j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),0)
+			elif matrix[i][j] == 20:	#Render as red
+				pygame.draw.rect(window, (RED[0],RED[1],RED[2],0),(j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),0)
+			elif matrix[i][j] == 30:	#Render as yellow
+				pygame.draw.rect(window, (RED[0],RED[1],RED[2],0),(j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),0)
+			elif matrix[i][j] == 1:		#Render falling block in specified color
+				pygame.draw.rect(window, (color[0],color[1],color[2],0),(j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),0)
 		pass
+def overlayBlock(falling_block, zones):
+	"""Overlays current falling block to appropiate zone"""
+	overlay_zone=falling_block.zone
+	zone=copy.deepcopy(zones[overlay_zone].space)
+	print("Copy Matrix")
+	showMatrix(zones[overlay_zone].space)
+
+	#TODO detect collision here
+	x_init=falling_block.x
+	y_init=falling_block.y
+	shape = falling_block.shape
+	for i in range(len(shape)):
+		x = x_init + i
+		y = y_init
+		if(x< ZONE_HEIGHT and x>=0):		#Operate if in valid space X
+			for j in range(len(shape[0])):
+				#Operate if in Valid Y space
+				y = y_init+j
+				if(y < ZONE_WIDTH and y>=0):
+					zone[x][y]=shape[i][j]		#Overwrite empty space eith block
+	#Modify relevant matrix and return
+	if overlay_zone ==0: return [zone, zones[1].space, zones[2].space]
+	elif overlay_zone ==1: return [zones[0].space, zone, zones[2].space]
+	elif overlay_zone ==2: return [zones[0].space, zones[1].space, zone]
+
+
+
+
+
 
 def evaluateGame(falling_block, zones):
 	if FALLING_OBJECT:
-		print("Here goes the code for overlay block into area")
-		return joinMatrix(zones[0].space,zones[1].space,zones[2].space)
+		overlay = overlayBlock(falling_block, zones)
+		#return joinMatrix(zones[0].space,zones[1].space,zones[2].space)
+		return joinMatrix(overlay[0],overlay[1],overlay[2])
 	else:
 		return joinMatrix(zones[0].space,zones[1].space,zones[2].space)
 
@@ -163,12 +200,16 @@ def mainWindow():
 	zones=createZones();	#Create Board to play in
 	falling = None
 
+	#Create new block: Game Start
+	falling = create_block()
+	FALLING_OBJECT = True
+	blockStatus(falling)
+
 	while True:
-		window.fill((0,0,0))
-		#toRender = joinMatrix(zones)
-		#drawMatrix(window, toRender, [128,128,128])
+		window.fill((0,0,0))		
 		toRender = evaluateGame(falling, zones)
-		drawMatrix(window, toRender, RED)
+		if FALLING_OBJECT: drawMatrix(window, toRender, falling.color)
+		else: drawMatrix(window, toRender, RED)
 		for events in pygame.event.get():
 			if events.type == QUIT:
 				pygame.quit()
@@ -188,16 +229,15 @@ def mainWindow():
 					blockStatus(falling)
 				if events.key==K_RETURN:
 					print ("ENTER")
-					falling = create_block()
-					FALLING_OBJECT = True
-					blockStatus(falling)
+					falling.changeZone()
 				if events.key==K_DOWN:
 					print ("v")
 					falling.fall();
 					blockStatus(falling)
 
 		pygame.display.update()
-		time.sleep(.04)
+		time.sleep(.1)
+		#falling.fall();		#Fall piece
 
 
 
