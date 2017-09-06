@@ -3,7 +3,7 @@
 [x] Create_Canvas
 	[x] Draw_canvas
 [x] Create_Pieces
-	[ ] Show pieces
+	[x] Show pieces
 	[x] Coordinate_moves
 	[x] Rotate pieces
 	[ ] detect colission

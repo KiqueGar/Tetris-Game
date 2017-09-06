@@ -51,6 +51,7 @@ class falling_block(object):
 
 	def move(self, dir):
 		"""Moves block sideways"""
+		self.y+=dir
 		pass
 
 	def fall(self):
@@ -148,8 +149,6 @@ def overlayBlock(falling_block, zones):
 	"""Overlays current falling block to appropiate zone"""
 	overlay_zone=falling_block.zone
 	zone=copy.deepcopy(zones[overlay_zone].space)
-	print("Copy Matrix")
-	showMatrix(zones[overlay_zone].space)
 
 	#TODO detect collision here
 	x_init=falling_block.x
@@ -237,7 +236,7 @@ def mainWindow():
 
 		pygame.display.update()
 		time.sleep(.1)
-		#falling.fall();		#Fall piece
+		falling.fall();		#Fall piece
 
 
 
