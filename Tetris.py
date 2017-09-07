@@ -42,17 +42,18 @@ class falling_block(object):
 		self.y = None		# Y Cordinate is from left to right
 		self.color = None
 		self.zone = None
+		self.indexes =None
 
 	def rotate(self):
 		"""Rotates block"""
 		if self.name== 'O': return
 		rotated = list(zip(*self.shape[::-1]))
 		self.shape = rotated
+		self.getIndexes()
 
 	def move(self, dir):
 		"""Moves block sideways"""
 		self.y+=dir
-		pass
 
 	def fall(self):
 		"""Falls block 1 space"""
@@ -61,6 +62,15 @@ class falling_block(object):
 	def changeZone(self):
 		"""Changes game zone"""
 		self.zone = (self.zone+1)%3
+
+	def getIndexes(self):
+		indexes=[]
+		for j in range(len(self.shape)):
+			subindex = [i for i, e in enumerate(self.shape[j]) if e != 0]
+			if subindex!=[]:
+				for k in subindex:
+					indexes.append([j,k])
+		self.indexes=indexes
 
 class gameZone(object):
 	"""Game Zone object"""
@@ -90,6 +100,7 @@ def create_block():
 	block.zone = 1
 	block.x = -1
 	block.y = 3
+	block.getIndexes()
 	return block
 
 
@@ -154,15 +165,15 @@ def overlayBlock(falling_block, zones):
 	x_init=falling_block.x
 	y_init=falling_block.y
 	shape = falling_block.shape
-	for i in range(len(shape)):
-		x = x_init + i
-		y = y_init
+
+	for index in falling_block.indexes:
+		x = x_init + index[0]
+		y = y_init + index[1]
 		if(x< ZONE_HEIGHT and x>=0):		#Operate if in valid space X
-			for j in range(len(shape[0])):
-				#Operate if in Valid Y space
-				y = y_init+j
-				if(y < ZONE_WIDTH and y>=0):
-					zone[x][y]=shape[i][j]		#Overwrite empty space eith block
+			if(y < ZONE_WIDTH and y>=0):	#Operate if in valid y space
+				zone[x][y]=1
+			else: print("Out of bounds in Y!")
+		else: print("Out of bound in X!!")
 	#Modify relevant matrix and return
 	if overlay_zone ==0: return [zone, zones[1].space, zones[2].space]
 	elif overlay_zone ==1: return [zones[0].space, zone, zones[2].space]
@@ -188,10 +199,10 @@ def showMatrix(matrix):
 
 def blockStatus(block):
 	"""Prints to console data about block object"""
-	print(block.name)
+	print(block.name, [block.x, block.y])
+	print(block.indexes)
 	print(block.color)
 	showMatrix(block.shape)
-	print([block.x, block.y])
 
 def mainWindow():
 	global FALLING_OBJECT
@@ -236,8 +247,30 @@ def mainWindow():
 
 		pygame.display.update()
 		time.sleep(.1)
-		falling.fall();		#Fall piece
+		#falling.fall();		#Fall piece
 
 
 
 mainWindow()
+
+#### EXAMPLE CODE
+"""
+def getIndexes(matrix):
+	indexes=[]
+	for j in range(len(matrix)):
+		subindex = [i for i, e in enumerate(matrix[j]) if e != 0]
+		if subindex!=[]:
+			for k in subindex:
+				indexes.append([j,k])
+	return indexes
+
+
+
+test_block= create_block()
+showMatrix(test_block.shape)
+print("")
+print(b)
+
+test_indexes = getIndexes(test_block.shape)
+print(test_indexes)
+"""
