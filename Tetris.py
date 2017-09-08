@@ -64,6 +64,7 @@ class falling_block(object):
 		self.zone = (self.zone+1)%3
 
 	def getIndexes(self):
+		"""Returns touples of non zero coordinates in shape"""
 		indexes=[]
 		for j in range(len(self.shape)):
 			subindex = [i for i, e in enumerate(self.shape[j]) if e != 0]
@@ -103,7 +104,9 @@ def create_block():
 	block.getIndexes()
 	return block
 
-
+def addBlockToZone(falling_block):
+	print("Deleting block and creating new one")
+	return create_block()
 
 def createMatrix(n,m):
 	"""Creates matrix to be used as container of blocks"""
@@ -179,10 +182,25 @@ def overlayBlock(falling_block, zones):
 	elif overlay_zone ==1: return [zones[0].space, zone, zones[2].space]
 	elif overlay_zone ==2: return [zones[0].space, zones[1].space, zone]
 
+def isValidMove(indexes, x_init, y_init, space):
+	"""Check if movement is valid"""
+	for index in indexes:
+		x = x_init + index[0]
+		y = y_init + index[1]
+		if(x< ZONE_HEIGHT and x>=0):		#Operate if in valid space X
+			if(y < ZONE_WIDTH and y>=0):	#Operate if in valid y space
+				if(space[x][y]==0):		#If space is empty
+					pass
+				else:
+					print("Collision!")
+					return False
+			else: return False
+		else: return False
+	return True
 
-
-
-
+def checkColission(falling_block):
+	"""Check for collition, append to zone if true"""
+	addBlockToZone(falling_block)
 
 def evaluateGame(falling_block, zones):
 	if FALLING_OBJECT:
@@ -227,23 +245,36 @@ def mainWindow():
 			elif events.type == KEYDOWN:
 				if events.key==K_UP:
 					print ("^")
-					falling.rotate()
-					blockStatus(falling)
+					future_block=copy.deepcopy(falling)	#Create a copy of block
+					future_block.rotate()
+					if isValidMove(future_block.indexes, future_block.x, future_block.y, zones[future_block.zone].space):
+						falling.rotate()
+						blockStatus(falling)
+					#else: print("No change! Interference")
+					del future_block
+						
 				if events.key==K_LEFT:
 					print ("<")
-					falling.move(-1)
-					blockStatus(falling)
+					if isValidMove(falling.indexes, falling.x, falling.y-1, zones[falling.zone].space):
+						falling.move(-1)
+						blockStatus(falling)
 				if events.key==K_RIGHT:
 					print (">")
-					falling.move(1)
-					blockStatus(falling)
+					if isValidMove(falling.indexes, falling.x, falling.y+1, zones[falling.zone].space):
+						falling.move(1)	
+						blockStatus(falling)
 				if events.key==K_RETURN:
 					print ("ENTER")
 					falling.changeZone()
 				if events.key==K_DOWN:
 					print ("v")
-					falling.fall();
-					blockStatus(falling)
+					if isValidMove(falling.indexes, falling.x+1, falling.y, zones[falling.zone].space):
+						falling.fall()
+						blockStatus(falling)
+					else:
+						print("Appending to zone.space")
+						falling = addBlockToZone(falling)
+					
 
 		pygame.display.update()
 		time.sleep(.1)

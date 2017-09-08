@@ -6,7 +6,10 @@
 	[x] Show pieces
 	[x] Coordinate_moves
 	[x] Rotate pieces
-	[ ] detect colission
+	[x] detect colission
+[ ] Add colision/end of X to zone
+	[x] Delete falling object
+	[x] Create new falling object
 [ ] Remove completed row
 	[ ] Do not remove if not same color
 	[ ] Fall pieces down
