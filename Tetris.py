@@ -33,6 +33,7 @@ NAMES = ['T', 'S', 'Z', 'J', 'L', 'O', 'I']
 
 FALLING_OBJECT=False
 GAME_ALIVE = True
+CONSOLE_DEBUG = False
 
 class falling_block(object):
 	"""Falling Object Class"""
@@ -223,7 +224,7 @@ def addBlockToZone(falling_block, game_space):
 		x = x_init + index[0]
 		y = y_init + index[1]
 		game_space[x][y]=filler 		#Fill space with previous block
-	print("Deleting block and creating new one")
+	if CONSOLE_DEBUG: print("Deleting block and creating new one")
 	return create_block()			#Create new block
 
 def isValidMove(indexes, x_init, y_init, space):
@@ -251,9 +252,9 @@ def checkColission(falling_block, zones, next_block):
 	game_space = zones[zone].space 	# Check if falling is valid 
 	if isValidMove(falling_block.indexes, falling_block.x+1, falling_block.y, game_space):
 		falling_block.fall()		# Fall if is valid
-		blockStatus(falling_block)
+		if CONSOLE_DEBUG: blockStatus(falling_block)
 	else:						#If not valid, append to zone as filled space
-		print("Appending to zone.space")
+		if CONSOLE_DEBUG: print("Appending to zone.space")
 		falling_block=addBlockToZone(falling_block, game_space)
 		zones[zone].getIndexes() 	# Refresh filled spaces
 		return rollNext(next_block)	# Roll to next block
@@ -295,7 +296,7 @@ def mainWindow():
 	next_block = create_block()
 	falling, next_block = rollNext(next_block)	# Get next block
 	FALLING_OBJECT = True
-	blockStatus(falling)
+	if CONSOLE_DEBUG: blockStatus(falling)
 
 	while GAME_ALIVE:
 		window.fill((0,0,0))		
@@ -314,7 +315,7 @@ def mainWindow():
 					future_block.rotate()
 					if isValidMove(future_block.indexes, future_block.x, future_block.y, zones[future_block.zone].space):
 						falling.rotate()
-						blockStatus(falling)
+						if CONSOLE_DEBUG: blockStatus(falling)
 					#else: print("No change! Interference")
 					del future_block
 						
@@ -322,12 +323,12 @@ def mainWindow():
 					print ("<")
 					if isValidMove(falling.indexes, falling.x, falling.y-1, zones[falling.zone].space):
 						falling.move(-1)
-						blockStatus(falling)
+						if CONSOLE_DEBUG: blockStatus(falling)
 				if events.key==K_RIGHT:
 					print (">")
 					if isValidMove(falling.indexes, falling.x, falling.y+1, zones[falling.zone].space):
 						falling.move(1)	
-						blockStatus(falling)
+						if CONSOLE_DEBUG: blockStatus(falling)
 				if events.key==K_RETURN:
 					print ("ENTER")
 					falling.changeZone()
@@ -337,8 +338,9 @@ def mainWindow():
 
 		pygame.display.update()
 		time.sleep(.1)
-		falling, next_block = checkColission(falling, zones, next_block);		#Fall piece
-
+		#falling, next_block = checkColission(falling, zones, next_block);	#Fall piece
+		#showMatrix(zones[1].space)
+		print(zones[1].filled_spaces)
 
 
 mainWindow()
