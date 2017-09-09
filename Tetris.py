@@ -32,6 +32,7 @@ SHAPES = [SHAPE_T, SHAPE_S, SHAPE_Z, SHAPE_J, SHAPE_L, SHAPE_O, SHAPE_I]
 NAMES = ['T', 'S', 'Z', 'J', 'L', 'O', 'I']
 
 FALLING_OBJECT=False
+GAME_ALIVE = True
 
 class falling_block(object):
 	"""Falling Object Class"""
@@ -168,6 +169,18 @@ def drawMatrix(window, matrix, color):
 			elif matrix[i][j] == 1:		#Render falling block in specified color
 				pygame.draw.rect(window, (color[0],color[1],color[2],0),(j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),0)
 
+def drawNext(window, next_block):
+	"""Renders next block"""
+	color=next_block.color
+	x_render=2
+	y_render=40
+	for i in range(len(next_block.shape)):
+		x = x_render + i
+		for j in range(len(next_block.shape[i])):
+			y = y_render + j
+			if next_block.shape[i][j] == 1:
+				pygame.draw.rect(window, (color[0],color[1],color[2],0),(y*BLOCK_SIZE, x*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),0)
+
 def overlayBlock(falling_block, zones):
 	"""Overlays current falling block to appropiate zone"""
 	overlay_zone=falling_block.zone 		
@@ -218,15 +231,16 @@ def isValidMove(indexes, x_init, y_init, space):
 					pass
 				else:
 					print("Collision!")
-					#TODO Game over condition Here
+					if (x_init == 0):
+						#TODO Game over condition Heree
+						gameOver()
 					return False
 			else: return False
 		else: return False
 	return True
 
 def checkColission(falling_block, zones):
-	"""Check for collition, append to zone if true, fall if not
-	e zone indexes"""
+	"""Check for collition, append to zone if true, fall if not"""
 	zone = falling_block.zone 		# Get space zone to operate
 	game_space = zones[zone].space 	# Check if falling is valid 
 	if isValidMove(falling_block.indexes, falling_block.x+1, falling_block.y, game_space):
@@ -259,6 +273,11 @@ def blockStatus(block):
 	print(block.color)
 	showMatrix(block.shape)
 
+def gameOver():
+	global GAME_ALIVE
+	GAME_ALIVE = False
+	print("Game Over!!")
+
 def mainWindow():
 	global FALLING_OBJECT
 	window = pygame.display.set_mode((800,600))
@@ -266,15 +285,17 @@ def mainWindow():
 	falling = None
 
 	#Create new block: Game Start
+	next_block = create_block()
 	falling = create_block()
 	FALLING_OBJECT = True
 	blockStatus(falling)
 
-	while True:
+	while GAME_ALIVE:
 		window.fill((0,0,0))		
 		toRender = evaluateGame(falling, zones)
 		if FALLING_OBJECT: drawMatrix(window, toRender, falling.color)
 		else: drawMatrix(window, toRender, RED)
+		drawNext(window, next_block)
 		for events in pygame.event.get():
 			if events.type == QUIT:
 				pygame.quit()

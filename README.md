@@ -5,3 +5,7 @@ A tetris game written in python
 
 A conda environment is created, you can clone it by using
 `conda `
+
+## Known bugs
+
+- Game closes at Game Over
