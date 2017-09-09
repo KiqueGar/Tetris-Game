@@ -8,4 +8,6 @@ A conda environment is created, you can clone it by using
 
 ## Known bugs
 
-- Game closes at Game Over
+## Future implementations
+- Game don't closes at Game Over
+- Blocks generate at random positions

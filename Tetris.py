@@ -118,6 +118,12 @@ def create_block():
 	block.getIndexes()
 	return block
 
+def rollNext(next_block):
+	"""Changes next block to falling block, generates new next"""
+	falling=copy.deepcopy(next_block)	#Copy next to falling
+	next_block = create_block()		#Generate next Block
+	return falling, next_block
+
 def createMatrix(n,m):
 	"""Creates matrix to be used as container of blocks"""
 	matrix = []
@@ -239,7 +245,7 @@ def isValidMove(indexes, x_init, y_init, space):
 		else: return False
 	return True
 
-def checkColission(falling_block, zones):
+def checkColission(falling_block, zones, next_block):
 	"""Check for collition, append to zone if true, fall if not"""
 	zone = falling_block.zone 		# Get space zone to operate
 	game_space = zones[zone].space 	# Check if falling is valid 
@@ -249,8 +255,9 @@ def checkColission(falling_block, zones):
 	else:						#If not valid, append to zone as filled space
 		print("Appending to zone.space")
 		falling_block=addBlockToZone(falling_block, game_space)
-		zones[zone].getIndexes() 	#Refresh filled spaces
-	return falling_block
+		zones[zone].getIndexes() 	# Refresh filled spaces
+		return rollNext(next_block)	# Roll to next block
+	return falling_block, next_block
 
 def evaluateGame(falling_block, zones):
 	"""Appends all zones and overlays falling block before rendering"""
@@ -286,7 +293,7 @@ def mainWindow():
 
 	#Create new block: Game Start
 	next_block = create_block()
-	falling = create_block()
+	falling, next_block = rollNext(next_block)	# Get next block
 	FALLING_OBJECT = True
 	blockStatus(falling)
 
@@ -326,11 +333,11 @@ def mainWindow():
 					falling.changeZone()
 				if events.key==K_DOWN:
 					print ("v")
-					falling = checkColission(falling, zones)
+					falling, next_block = checkColission(falling, zones, next_block)
 
 		pygame.display.update()
 		time.sleep(.1)
-		falling = checkColission(falling, zones);		#Fall piece
+		falling, next_block = checkColission(falling, zones, next_block);		#Fall piece
 
 
 

@@ -8,7 +8,7 @@
 	[x] Rotate pieces
 	[x] detect colission
 [x] Show next piece
-	[ ] Use next piece as falling block and generate new next block
+	[x] Use next piece as falling block and generate new next block
 [x] Add colision/end of X to zone
 	[x] Delete falling object
 	[x] Create new falling object
