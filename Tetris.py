@@ -104,7 +104,9 @@ def create_block():
 	block.getIndexes()
 	return block
 
-def addBlockToZone(falling_block):
+def addBlockToZone(falling_block, game_space):
+	"""Adds a colliding or bottom falling block to fixed space"""
+	
 	print("Deleting block and creating new one")
 	return create_block()
 
@@ -198,9 +200,15 @@ def isValidMove(indexes, x_init, y_init, space):
 		else: return False
 	return True
 
-def checkColission(falling_block):
-	"""Check for collition, append to zone if true"""
-	addBlockToZone(falling_block)
+def checkColission(falling_block, game_space):
+	"""Check for collition, append to zone if true, fall if not"""
+	if isValidMove(falling_block.indexes, falling_block.x+1, falling_block.y, game_space):
+		falling_block.fall()
+		blockStatus(falling_block)
+	else:
+		print("Appending to zone.space")
+		falling_block=addBlockToZone(falling_block, game_space)
+	return falling_block
 
 def evaluateGame(falling_block, zones):
 	if FALLING_OBJECT:
@@ -268,40 +276,12 @@ def mainWindow():
 					falling.changeZone()
 				if events.key==K_DOWN:
 					print ("v")
-					if isValidMove(falling.indexes, falling.x+1, falling.y, zones[falling.zone].space):
-						falling.fall()
-						blockStatus(falling)
-					else:
-						print("Appending to zone.space")
-						falling = addBlockToZone(falling)
-					
+					falling = checkColission(falling, zones[falling.zone].space)
 
 		pygame.display.update()
 		time.sleep(.1)
-		#falling.fall();		#Fall piece
+		falling = checkColission(falling, zones[falling.zone].space);		#Fall piece
 
 
 
 mainWindow()
-
-#### EXAMPLE CODE
-"""
-def getIndexes(matrix):
-	indexes=[]
-	for j in range(len(matrix)):
-		subindex = [i for i, e in enumerate(matrix[j]) if e != 0]
-		if subindex!=[]:
-			for k in subindex:
-				indexes.append([j,k])
-	return indexes
-
-
-
-test_block= create_block()
-showMatrix(test_block.shape)
-print("")
-print(b)
-
-test_indexes = getIndexes(test_block.shape)
-print(test_indexes)
-"""
