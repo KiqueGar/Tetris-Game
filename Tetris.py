@@ -79,6 +79,19 @@ class gameZone(object):
 		self.height = ZONE_HEIGHT
 		self.width = ZONE_HEIGHT
 		self.space = None
+		self.filled_spaces = None
+		self.color = None
+		self.externals = []
+
+	def getIndexes(self):
+		"""Returns touples of non zero contents in game space"""
+		indexes=[]
+		for j in range(len(self.space)):
+			subindex = [i for i, e in enumerate(self.space[j]) if e != 0]
+			if subindex!=[]:
+				for k in subindex:
+					indexes.append([j,k])
+		self.filled_spaces=indexes
 
 def createZones():
 	"""Creates 3 gameZone objects, return them in array"""
@@ -103,12 +116,6 @@ def create_block():
 	block.y = 3
 	block.getIndexes()
 	return block
-
-def addBlockToZone(falling_block, game_space):
-	"""Adds a colliding or bottom falling block to fixed space"""
-	
-	print("Deleting block and creating new one")
-	return create_block()
 
 def createMatrix(n,m):
 	"""Creates matrix to be used as container of blocks"""
@@ -157,16 +164,14 @@ def drawMatrix(window, matrix, color):
 			elif matrix[i][j] == 20:	#Render as red
 				pygame.draw.rect(window, (RED[0],RED[1],RED[2],0),(j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),0)
 			elif matrix[i][j] == 30:	#Render as yellow
-				pygame.draw.rect(window, (RED[0],RED[1],RED[2],0),(j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),0)
+				pygame.draw.rect(window, (YELLOW[0],YELLOW[1],YELLOW[2],0),(j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),0)
 			elif matrix[i][j] == 1:		#Render falling block in specified color
 				pygame.draw.rect(window, (color[0],color[1],color[2],0),(j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),0)
-		pass
+
 def overlayBlock(falling_block, zones):
 	"""Overlays current falling block to appropiate zone"""
-	overlay_zone=falling_block.zone
+	overlay_zone=falling_block.zone 		
 	zone=copy.deepcopy(zones[overlay_zone].space)
-
-	#TODO detect collision here
 	x_init=falling_block.x
 	y_init=falling_block.y
 	shape = falling_block.shape
@@ -184,9 +189,27 @@ def overlayBlock(falling_block, zones):
 	elif overlay_zone ==1: return [zones[0].space, zone, zones[2].space]
 	elif overlay_zone ==2: return [zones[0].space, zones[1].space, zone]
 
+def addBlockToZone(falling_block, game_space):
+	"""Adds a colliding or bottom falling block to fixed space"""
+	x_init = falling_block.x 		#Get block coordinates
+	y_init = falling_block.y
+	color = falling_block.color 		#Acording to block color, chose fillercolor
+	if color == BLUE: filler = 10
+	elif color == RED: filler = 20
+	elif color == YELLOW: filler = 30
+	else: 						# If such color doesn´t exist, ignore
+		print("addBlockToZone: Invalid color of falling block!")
+		filler = 1
+	for index in falling_block.indexes:
+		x = x_init + index[0]
+		y = y_init + index[1]
+		game_space[x][y]=filler 		#Fill space with previous block
+	print("Deleting block and creating new one")
+	return create_block()			#Create new block
+
 def isValidMove(indexes, x_init, y_init, space):
 	"""Check if movement is valid"""
-	for index in indexes:
+	for index in indexes:				#Iterate over known filled in shape
 		x = x_init + index[0]
 		y = y_init + index[1]
 		if(x< ZONE_HEIGHT and x>=0):		#Operate if in valid space X
@@ -195,22 +218,28 @@ def isValidMove(indexes, x_init, y_init, space):
 					pass
 				else:
 					print("Collision!")
+					#TODO Game over condition Here
 					return False
 			else: return False
 		else: return False
 	return True
 
-def checkColission(falling_block, game_space):
-	"""Check for collition, append to zone if true, fall if not"""
+def checkColission(falling_block, zones):
+	"""Check for collition, append to zone if true, fall if not
+	e zone indexes"""
+	zone = falling_block.zone 		# Get space zone to operate
+	game_space = zones[zone].space 	# Check if falling is valid 
 	if isValidMove(falling_block.indexes, falling_block.x+1, falling_block.y, game_space):
-		falling_block.fall()
+		falling_block.fall()		# Fall if is valid
 		blockStatus(falling_block)
-	else:
+	else:						#If not valid, append to zone as filled space
 		print("Appending to zone.space")
 		falling_block=addBlockToZone(falling_block, game_space)
+		zones[zone].getIndexes() 	#Refresh filled spaces
 	return falling_block
 
 def evaluateGame(falling_block, zones):
+	"""Appends all zones and overlays falling block before rendering"""
 	if FALLING_OBJECT:
 		overlay = overlayBlock(falling_block, zones)
 		#return joinMatrix(zones[0].space,zones[1].space,zones[2].space)
@@ -276,11 +305,11 @@ def mainWindow():
 					falling.changeZone()
 				if events.key==K_DOWN:
 					print ("v")
-					falling = checkColission(falling, zones[falling.zone].space)
+					falling = checkColission(falling, zones)
 
 		pygame.display.update()
 		time.sleep(.1)
-		falling = checkColission(falling, zones[falling.zone].space);		#Fall piece
+		falling = checkColission(falling, zones);		#Fall piece
 
 
 
