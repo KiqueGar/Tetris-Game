@@ -338,6 +338,25 @@ def checkColission(falling_block, zones, next_block):
 		return rollNext(next_block)	# Roll to next block
 	return falling_block, next_block
 
+def checkForOutliers(lines, outliers_list):
+	valid_lines=[]
+	outlier_line=[]				# Get lines of outliners
+	print("Checking for outliers")
+	for outlier in outliers_list:
+		outlier_line.append(outlier[0])
+	if lines == None:				#If no lines yet, do nothing
+		return None
+	for line in lines:
+		if find_element_in_list(line, outlier_line) == None:
+			valid_lines.append(line)
+		else:
+			print("checkForOutliers: Line has outlier! Not removing")
+	if len(valid_lines)<1:
+		return None
+	else:
+		return valid_lines
+
+
 def checkForScore(zones):
 	"""Evaluates zones for completed lines"""
 	for zone in zones:							#Iterate over non empty zones
@@ -356,14 +375,14 @@ def checkForScore(zones):
 					last_row = row
 				if counter == ZONE_WIDTH -1:
 					completed_lines.append(row)
-					print("Completed line in ROW %i"%row)
-			#checkForOutliers					# Check and discard lines of outliers
-			valid_lines = completed_lines
+					#print("Completed line in ROW %i"%row)
+			#valid_lines = completed_lines			# Check and discard lines of outliers
+			if len(zone.externals)>0: valid_lines = checkForOutliers(completed_lines, zone.externals)
 			if valid_lines != None:
-				for line in completed_lines:			# Remove valid lines, replace with empty ones at top
+				for line in valid_lines:			# Remove valid lines, replace with empty ones at top
 					del zone.space[line]
 					zone.space.insert(0, copy.deepcopy(EMPTY_LINE))
-					if CONSOLE_DEBUG: print("Deleting line in ROW %i"%line)
+					print("Deleting line in ROW %i"%line)
 					global SCORE
 					global score_surface
 					SCORE += 1
@@ -409,11 +428,8 @@ def mainWindow():
 	window = pygame.display.set_mode((800,600))
 	zones=createZones();	#Create Board to play in
 	falling = None
-#	pygame.font.init()
-#	myfont = pygame.font.SysFont("Comic Sans MS", 15)
-	#Next_piece_surface = myfont.render('Next piece', 1, (255,255,255))
-	#Create new block: Game Start
-	next_block = create_block()
+	
+	next_block = create_block()				#Create new block: Game Start
 	falling, next_block = rollNext(next_block)	# Get next block
 	FALLING_OBJECT = True
 	if CONSOLE_DEBUG: blockStatus(falling)
@@ -445,6 +461,7 @@ def mainWindow():
 					print ("<")
 					if isValidMove(falling.indexes, falling.x, falling.y-1, zones[falling.zone].space):
 						falling.move(-1)
+						drawMatrix(window, toRender, falling.color)
 						if CONSOLE_DEBUG: blockStatus(falling)
 				if events.key==K_RIGHT:
 					print (">")
@@ -453,11 +470,17 @@ def mainWindow():
 						if CONSOLE_DEBUG: blockStatus(falling)
 				if events.key==K_RETURN:
 					print ("ENTER")
-					falling.changeZone()
 				if events.key==K_DOWN:
 					print ("v")
 					falling, next_block = checkColission(falling, zones, next_block)
 					#checkForScore(zones)
+				if events.key==K_LCTRL:
+					print("Left CTRL")
+					falling.changeZone()
+					falling.changeZone()
+				if events.key==K_LALT:
+					print("Left Alt")
+					falling.changeZone()
 
 		pygame.display.update()
 		time.sleep(.2)

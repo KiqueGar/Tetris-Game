@@ -7,6 +7,7 @@
 	[x] Coordinate_moves
 	[x] Rotate pieces
 	[x] detect colission
+		[ ] Don't change zone if destiny is filled	
 [x] Show next piece
 	[x] Use next piece as falling block and generate new next block
 [x] Add colision/end of X to zone
