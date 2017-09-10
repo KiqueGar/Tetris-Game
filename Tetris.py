@@ -4,6 +4,11 @@ from pygame.locals import*
 
 import random
 
+pygame.font.init()		# Load font module and font to use
+myfont = pygame.font.SysFont("Comic Sans MS", 15)
+scorefont = pygame.font.SysFont("Comic Sans MS", 45)
+
+
 #Canvas properties
 BLOCK_SIZE = 15		# Pixel size of blocks 
 TOP_BOTTOM_OFFSET=1	# Top and bottom blocks to render as "wall"
@@ -13,7 +18,8 @@ ZONE_WIDTH =10		# Total width of gamezone
 OFFSET = []
 EMPTY_LINE = []
 
-SCORE =0 
+SCORE =0
+score_surface = scorefont.render("{0}".format(SCORE), 1, (255,255,255))
 #Build bottom/top walls
 for i in range(3*(2*SIDE_OFFSET + ZONE_WIDTH)):
 	OFFSET.append(99)
@@ -337,7 +343,7 @@ def checkForScore(zones):
 	for zone in zones:							#Iterate over non empty zones
 		completed_lines=[]
 		valid_lines = None
-		if zone.filled_rotated != None:
+		if zone.filled_rotated != None and len(zone.filled_rotated)>0:
 			rows = zone.filled_rotated[0]			# Rename fo clarity
 			cols = zone.filled_rotated[0]
 			last_row = 99						# If 10 times a row appears, is
@@ -357,7 +363,11 @@ def checkForScore(zones):
 				for line in completed_lines:			# Remove valid lines, replace with empty ones at top
 					del zone.space[line]
 					zone.space.insert(0, copy.deepcopy(EMPTY_LINE))
-					print("Deleting line in ROW %i"%line)
+					if CONSOLE_DEBUG: print("Deleting line in ROW %i"%line)
+					global SCORE
+					global score_surface
+					SCORE += 1
+					score_surface = scorefont.render("{0}".format(SCORE), 1, (255,255,255))
 				zone.getIndexes()
 				zone.rotate()
 
@@ -388,12 +398,20 @@ def gameOver():
 	GAME_ALIVE = False
 	print("Game Over!!")
 
+def renderText(window, text, x=0, y=0):
+	"""Render text"""
+	text_render = myfont.render(text, 1, (255,255,255))
+	window.blit(text_render,(x,y))
+	window.blit(score_surface,(625,150))
+
 def mainWindow():
 	global FALLING_OBJECT
 	window = pygame.display.set_mode((800,600))
 	zones=createZones();	#Create Board to play in
 	falling = None
-
+#	pygame.font.init()
+#	myfont = pygame.font.SysFont("Comic Sans MS", 15)
+	#Next_piece_surface = myfont.render('Next piece', 1, (255,255,255))
 	#Create new block: Game Start
 	next_block = create_block()
 	falling, next_block = rollNext(next_block)	# Get next block
@@ -406,6 +424,8 @@ def mainWindow():
 		if FALLING_OBJECT: drawMatrix(window, toRender, falling.color)
 		else: drawMatrix(window, toRender, RED)
 		drawNext(window, next_block)
+		renderText(window, "Next Block", 600, 0)
+		
 		for events in pygame.event.get():
 			if events.type == QUIT:
 				pygame.quit()
@@ -443,5 +463,6 @@ def mainWindow():
 		time.sleep(.2)
 		falling, next_block = checkColission(falling, zones, next_block);	#Fall piece
 		checkForScore(zones)
+		print(SCORE)
 
 mainWindow()

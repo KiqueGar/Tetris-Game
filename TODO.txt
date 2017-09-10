@@ -16,10 +16,11 @@
 	[ ] Don´t close at Game Over
 [x] Remove completed row
 	[ ] Do not remove if not same color
+	[ ] Remove penalties
 	[ ] Fall pieces down
-[ ] Show text
-	[ ] Next piece
-	[ ] Show Score
+[x] Show text
+	[x] Next piece
+	[x] Show Score
 	[ ] Game Over
 [x] Outliers generation
 [ ] 
