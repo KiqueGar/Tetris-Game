@@ -206,27 +206,19 @@ def overlayBlock(falling_block, zones):
 	zone=[]
 	overlay_zone=falling_block.zone 		
 	zone=copy.deepcopy(zones[overlay_zone].space)
-	print("Inside overlayBlock, original zone")
-	showMatrix(zone)
-	print("End Original")
 	x_init=falling_block.x
 	y_init=falling_block.y
 	shape = falling_block.shape
 	falling_block.getIndexes()
-	print(falling_block.indexes)
 	for index in falling_block.indexes:
 		x = x_init + index[0]
 		y = y_init + index[1]
 		if(x< ZONE_HEIGHT and x>=0):		#Operate if in valid space X
 			if(y < ZONE_WIDTH and y>=0):	#Operate if in valid y space
-				print("Using: ", index)
 				zone[x][y]=1
 			else: print("Out of bounds in Y!")
 		else: print("Out of bound in X!!")
 	#Modify relevant matrix and return
-	print("Inside overlayBlock after update")
-	showMatrix(zone)
-	print("end")
 	if overlay_zone ==0: return [zone, zones[1].space, zones[2].space]
 	elif overlay_zone ==1: return [zones[0].space, zone, zones[2].space]
 	elif overlay_zone ==2: return [zones[0].space, zones[1].space, zone]
@@ -307,7 +299,7 @@ def checkForScore(zones):
 			if valid_lines != None:
 				for line in completed_lines:			# Remove valid lines, replace with empty ones at top
 					del zone.space[line]
-					zone.space.insert(0, EMPTY_LINE)
+					zone.space.insert(0, copy.deepcopy(EMPTY_LINE))
 					print("Deleting line in ROW %i"%line)
 				zone.getIndexes()
 				zone.rotate()
@@ -391,10 +383,8 @@ def mainWindow():
 					#checkForScore(zones)
 
 		pygame.display.update()
-		time.sleep(.1)
-		#falling, next_block = checkColission(falling, zones, next_block);	#Fall piece
+		time.sleep(.2)
+		falling, next_block = checkColission(falling, zones, next_block);	#Fall piece
 		checkForScore(zones)
-		print("Block Status")
-		blockStatus(falling)
 
 mainWindow()
