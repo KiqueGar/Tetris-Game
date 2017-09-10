@@ -21,7 +21,7 @@
 	[ ] Next piece
 	[ ] Show Score
 	[ ] Game Over
-[ ] 
+[x] Outliers generation
 [ ] 
 [ ] 
 [ ] 

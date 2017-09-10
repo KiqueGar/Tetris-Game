@@ -7,7 +7,7 @@ A conda environment is created, you can clone it by using
 `conda `
 
 ## Known bugs
-- Bad rendering in zone 1 equivalent to score
+Can't reproduce: bad assignment to zone color, thus bad color in outliers
 
 ## Future implementations
 - Game don't closes at Game Over

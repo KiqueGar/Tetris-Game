@@ -223,8 +223,10 @@ def overlayBlock(falling_block, zones):
 	elif overlay_zone ==1: return [zones[0].space, zone, zones[2].space]
 	elif overlay_zone ==2: return [zones[0].space, zones[1].space, zone]
 
-def addBlockToZone(falling_block, game_space):
+def addBlockToZone(falling_block, zones):
 	"""Adds a colliding or bottom falling block to fixed space"""
+	zone = zones[falling_block.zone]
+	game_space = zone.space
 	x_init = falling_block.x 		#Get block coordinates
 	y_init = falling_block.y
 	color = falling_block.color 		#Acording to block color, chose fillercolor
@@ -234,12 +236,68 @@ def addBlockToZone(falling_block, game_space):
 	else: 						# If such color doesn´t exist, ignore
 		print("addBlockToZone: Invalid color of falling block!")
 		filler = 1
-	for index in falling_block.indexes:
-		x = x_init + index[0]
-		y = y_init + index[1]
-		game_space[x][y]=filler 		#Fill space with previous block
+	if zone.color == None:			# If zone is not yet defined, define a color
+		zone.color = copy.deepcopy(falling_block.color)
+	if zone.color == falling_block.color:	# If correct color zone, add all to zone
+		for index in falling_block.indexes:
+			x = x_init + index[0]
+			y = y_init + index[1]
+			game_space[x][y]=filler 		#Fill space with previous block
+	else: 
+		print("Not correct zone! Penalty!")
+		i=0							# Add 2 squares to this zone, one to each other zone
+		for index in reversed(falling_block.indexes):
+			i+=1
+			x = x_init + index[0]
+			y = y_init + index[1]
+			zone.externals.append([x,y])
+			game_space[x][y]=filler
+			if i == 2: break
+		addPenalty(zones, falling_block,1)
+		addPenalty(zones, falling_block,2)
+
 	if CONSOLE_DEBUG: print("Deleting block and creating new one")
 	return create_block()			#Create new block
+
+def addPenalty(zones, falling_block, number):
+	"""Adds penalty to other zones"""
+	color = zones[falling_block.zone].color
+	if color == BLUE: filler = 10
+	elif color == RED: filler = 20
+	elif color == YELLOW: filler = 30
+	else: 						# If such color doesn´t exist, ignore
+		print("addPenalty: Invalid color of zone space!")
+		filler = 1
+	zone = zones[(falling_block.zone + number)%3]
+	game_space = zone.space
+	col = random.randint(0,9)
+	if zone.filled_spaces == None:	# If empty zone, add at bottom at random
+		game_space[29][col] = filler
+		zone.externals.append([29,col])
+	else:
+		toAppended = True
+		lower=29
+		while(toAppended):
+			if find_element_in_list([lower,col], zone.filled_spaces) == None:
+				game_space[lower][col] = filler
+				zone.externals.append([lower,col])
+				if CONSOLE_DEBUG: print("addPenalty: Appending to:", [lower,col])
+				toAppended = False
+			else:
+				lower-=1
+				if CONSOLE_DEBUG: print("addPenalty: Non empty space, trying again")
+				toAppended= True
+				
+	zone.getIndexes()				# Update indexes and outliers in zone
+	zone.rotate()
+	print(zone.filled_spaces)
+	
+def find_element_in_list(element, list_element):
+    try:
+        index_element = list_element.index(element)
+        return index_element
+    except ValueError:
+        return None
 
 def isValidMove(indexes, x_init, y_init, space):
 	"""Check if movement is valid"""
@@ -251,9 +309,8 @@ def isValidMove(indexes, x_init, y_init, space):
 				if(space[x][y]==0):		#If space is empty
 					pass
 				else:
-					print("Collision!")
+					if CONSOLE_DEBUG: print("Collision!")
 					if (x_init == 0):
-						#TODO Game over condition Heree
 						gameOver()
 					return False
 			else: return False
@@ -269,7 +326,7 @@ def checkColission(falling_block, zones, next_block):
 		if CONSOLE_DEBUG: blockStatus(falling_block)
 	else:						#If not valid, append to zone as filled space
 		if CONSOLE_DEBUG: print("Appending to zone.space")
-		falling_block=addBlockToZone(falling_block, game_space)
+		falling_block=addBlockToZone(falling_block, zones)
 		zones[zone].getIndexes() 	# Refresh filled spaces
 		zones[zone].rotate()
 		return rollNext(next_block)	# Roll to next block
