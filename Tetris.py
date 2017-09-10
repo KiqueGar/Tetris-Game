@@ -107,7 +107,26 @@ class gameZone(object):
 				for k in subindex:
 					indexes.append([j,k])
 		self.filled_spaces=indexes
+	
+	def updateExternals(self):
+		"""Updates external indexes"""
+		color = self.color
+		if color == None:					# If no assigned color, all are outliers
+			self.externals = copy.deepcopy(self.filled_spaces)
+			return
+		if color == BLUE: match = 10			#Use a different match acording to zone color
+		elif color == RED: match = 20
+		elif color == YELLOW: match = 30
+		outliers=[]						# Iterate across filled space detecting outliers
+		for filled in self.filled_spaces:
+			if self.space[filled[0]][filled[1]] != match:
+				outliers.append(filled)
+		if len(outliers)<1:
+			return
+		else:
+			self.externals = copy.deepcopy(outliers)
 
+	
 	def rotate(self):
 		"""Rotates space slicing"""
 		rotated = list(zip(*self.filled_spaces[::-1]))
@@ -256,8 +275,9 @@ def addBlockToZone(falling_block, zones):
 			i+=1
 			x = x_init + index[0]
 			y = y_init + index[1]
-			zone.externals.append([x,y])
 			game_space[x][y]=filler
+			zone.getIndexes()
+			zone.updateExternals()
 			if i == 2: break
 		addPenalty(zones, falling_block,1)
 		addPenalty(zones, falling_block,2)
@@ -279,14 +299,12 @@ def addPenalty(zones, falling_block, number):
 	col = random.randint(0,9)
 	if zone.filled_spaces == None:	# If empty zone, add at bottom at random
 		game_space[29][col] = filler
-		zone.externals.append([29,col])
 	else:
 		toAppended = True
 		lower=29
 		while(toAppended):
 			if find_element_in_list([lower,col], zone.filled_spaces) == None:
 				game_space[lower][col] = filler
-				zone.externals.append([lower,col])
 				if CONSOLE_DEBUG: print("addPenalty: Appending to:", [lower,col])
 				toAppended = False
 			else:
@@ -295,6 +313,7 @@ def addPenalty(zones, falling_block, number):
 				toAppended= True
 				
 	zone.getIndexes()				# Update indexes and outliers in zone
+	zone.updateExternals()
 	zone.rotate()
 	print(zone.filled_spaces)
 	
@@ -375,7 +394,7 @@ def checkForScore(zones):
 					last_row = row
 				if counter == ZONE_WIDTH -1:
 					completed_lines.append(row)
-					#print("Completed line in ROW %i"%row)
+					print("Possible line in ROW %i"%row)
 			#valid_lines = completed_lines			# Check and discard lines of outliers
 			if len(zone.externals)>0: valid_lines = checkForOutliers(completed_lines, zone.externals)
 			if valid_lines != None:
@@ -388,6 +407,7 @@ def checkForScore(zones):
 					SCORE += 1
 					score_surface = scorefont.render("{0}".format(SCORE), 1, (255,255,255))
 				zone.getIndexes()
+				zone.updateExternals()
 				zone.rotate()
 
 

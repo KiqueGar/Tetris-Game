@@ -24,8 +24,8 @@
 	[x] Show Score
 	[ ] Game Over
 [x] Outliers generation
-[ ] 
-[ ] 
+[ ] Add conda env to documentation
+[ ] Generate .EXE
 [ ] 
 [ ] 
 [ ] 
