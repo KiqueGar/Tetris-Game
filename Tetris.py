@@ -11,9 +11,15 @@ SIDE_OFFSET = 1		# "wall" width of gamezones
 ZONE_HEIGHT = 30	# Total height of gamezone
 ZONE_WIDTH =10		# Total width of gamezone
 OFFSET = []
+EMPTY_LINE = []
+
+SCORE =0 
 #Build bottom/top walls
 for i in range(3*(2*SIDE_OFFSET + ZONE_WIDTH)):
 	OFFSET.append(99)
+#Build empty line
+for i in range(ZONE_WIDTH):
+	EMPTY_LINE.append(0)
 #Color definitions
 BLUE = [66,154,223]
 RED = [205, 30, 16]
@@ -82,6 +88,7 @@ class gameZone(object):
 		self.width = ZONE_HEIGHT
 		self.space = None
 		self.filled_spaces = None
+		self.filled_rotated = None
 		self.color = None
 		self.externals = []
 
@@ -94,6 +101,11 @@ class gameZone(object):
 				for k in subindex:
 					indexes.append([j,k])
 		self.filled_spaces=indexes
+
+	def rotate(self):
+		"""Rotates space slicing"""
+		rotated = list(zip(*self.filled_spaces[::-1]))
+		self.filled_rotated = rotated
 
 def createZones():
 	"""Creates 3 gameZone objects, return them in array"""
@@ -123,6 +135,7 @@ def rollNext(next_block):
 	"""Changes next block to falling block, generates new next"""
 	falling=copy.deepcopy(next_block)	#Copy next to falling
 	next_block = create_block()		#Generate next Block
+	falling.getIndexes()
 	return falling, next_block
 
 def createMatrix(n,m):
@@ -190,21 +203,30 @@ def drawNext(window, next_block):
 
 def overlayBlock(falling_block, zones):
 	"""Overlays current falling block to appropiate zone"""
+	zone=[]
 	overlay_zone=falling_block.zone 		
 	zone=copy.deepcopy(zones[overlay_zone].space)
+	print("Inside overlayBlock, original zone")
+	showMatrix(zone)
+	print("End Original")
 	x_init=falling_block.x
 	y_init=falling_block.y
 	shape = falling_block.shape
-
+	falling_block.getIndexes()
+	print(falling_block.indexes)
 	for index in falling_block.indexes:
 		x = x_init + index[0]
 		y = y_init + index[1]
 		if(x< ZONE_HEIGHT and x>=0):		#Operate if in valid space X
 			if(y < ZONE_WIDTH and y>=0):	#Operate if in valid y space
+				print("Using: ", index)
 				zone[x][y]=1
 			else: print("Out of bounds in Y!")
 		else: print("Out of bound in X!!")
 	#Modify relevant matrix and return
+	print("Inside overlayBlock after update")
+	showMatrix(zone)
+	print("end")
 	if overlay_zone ==0: return [zone, zones[1].space, zones[2].space]
 	elif overlay_zone ==1: return [zones[0].space, zone, zones[2].space]
 	elif overlay_zone ==2: return [zones[0].space, zones[1].space, zone]
@@ -257,8 +279,39 @@ def checkColission(falling_block, zones, next_block):
 		if CONSOLE_DEBUG: print("Appending to zone.space")
 		falling_block=addBlockToZone(falling_block, game_space)
 		zones[zone].getIndexes() 	# Refresh filled spaces
+		zones[zone].rotate()
 		return rollNext(next_block)	# Roll to next block
 	return falling_block, next_block
+
+def checkForScore(zones):
+	"""Evaluates zones for completed lines"""
+	for zone in zones:							#Iterate over non empty zones
+		completed_lines=[]
+		valid_lines = None
+		if zone.filled_rotated != None:
+			rows = zone.filled_rotated[0]			# Rename fo clarity
+			cols = zone.filled_rotated[0]
+			last_row = 99						# If 10 times a row appears, is
+			counter = 0						# a completed line
+			for row in rows:
+				if row == last_row :
+					counter += 1
+				else:
+					counter = 0
+					last_row = row
+				if counter == ZONE_WIDTH -1:
+					completed_lines.append(row)
+					print("Completed line in ROW %i"%row)
+			#checkForOutliers					# Check and discard lines of outliers
+			valid_lines = completed_lines
+			if valid_lines != None:
+				for line in completed_lines:			# Remove valid lines, replace with empty ones at top
+					del zone.space[line]
+					zone.space.insert(0, EMPTY_LINE)
+					print("Deleting line in ROW %i"%line)
+				zone.getIndexes()
+				zone.rotate()
+
 
 def evaluateGame(falling_block, zones):
 	"""Appends all zones and overlays falling block before rendering"""
@@ -335,12 +388,13 @@ def mainWindow():
 				if events.key==K_DOWN:
 					print ("v")
 					falling, next_block = checkColission(falling, zones, next_block)
+					#checkForScore(zones)
 
 		pygame.display.update()
 		time.sleep(.1)
 		#falling, next_block = checkColission(falling, zones, next_block);	#Fall piece
-		#showMatrix(zones[1].space)
-		print(zones[1].filled_spaces)
-
+		checkForScore(zones)
+		print("Block Status")
+		blockStatus(falling)
 
 mainWindow()

@@ -14,7 +14,7 @@
 	[x] Create new falling object
 [x] Gameover condition
 	[ ] Don´t close at Game Over
-[ ] Remove completed row
+[x] Remove completed row
 	[ ] Do not remove if not same color
 	[ ] Fall pieces down
 [ ] Show text
