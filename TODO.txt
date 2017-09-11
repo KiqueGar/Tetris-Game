@@ -24,9 +24,9 @@
 	[x] Show Score
 	[ ] Game Over
 [x] Outliers generation
-[ ] Change speed acording to score
+[x] Change speed acording to score
 [ ] Add conda env to documentation
-[ ] Generate .EXE
+[x] Generate .EXE
 [ ] 
 [ ] 
 [ ] 

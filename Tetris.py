@@ -1,4 +1,4 @@
-import pygame,sys,time, copy
+import pygame,sys,time,copy,math
 
 from pygame.locals import* 
 
@@ -138,14 +138,14 @@ class gameZone(object):
 			if upper !=0:						#If upper block exist
 				self.space[i][coordinate[1]] = upper
 			else:
-				print("Interrupting at row: ", i)
+				if CONSOLE_DEBUG: print("fallAfterDelete: Interrupting at row: ", i)
 				self.space[i][coordinate[1]] = upper
 				break
 				
 		self.getIndexes()
 		self.rotate()
 		self.updateExternals()
-		print("Rolled down!")
+		if CONSOLE_DEBUG: print("fallAfterDelete: Rolled down!")
 
 	def deleteExternal(self):
 		"""Delete an external from space"""
@@ -154,9 +154,6 @@ class gameZone(object):
 		print("deleting: ", outlier)
 		self.space[outlier[0]][outlier[1]]=0
 		self.fallAfterDelete(outlier)
-		#self.getIndexes()
-		#self.rotate()
-		#self.updateExternals()
 
 def createZones():
 	"""Creates 3 gameZone objects, return them in array"""
@@ -341,7 +338,6 @@ def addPenalty(zones, falling_block, number):
 	zone.getIndexes()				# Update indexes and outliers in zone
 	zone.updateExternals()
 	zone.rotate()
-	print(zone.filled_spaces)
 	
 def removePenalty(zones, seed):
 	"""Removes a penalty from zone (if exist), attemps 2 times"""
@@ -365,7 +361,6 @@ def zoneHasExternals(zone):
 		return True
 	return False
 
-
 def find_element_in_list(element, list_element):
     try:
         index_element = list_element.index(element)
@@ -383,7 +378,7 @@ def isValidMove(indexes, x_init, y_init, space):
 				if(space[x][y]==0):		#If space is empty
 					pass
 				else:
-					if CONSOLE_DEBUG: print("Collision!")
+					if CONSOLE_DEBUG: print("isValidMove: Collision!")
 					if (x_init == 0):
 						gameOver()
 					return False
@@ -460,6 +455,11 @@ def checkForScore(zones):
 				zone.updateExternals()
 				zone.rotate()
 
+def fallingSpeed():
+	"""Returns interval between blocks as function of score"""
+	global SCORE
+	if SCORE <=10: return 0.3
+	else: return 0.3*(1 - math.exp(-5/(SCORE-5)))
 
 def evaluateGame(falling_block, zones):
 	"""Appends all zones and overlays falling block before rendering"""
@@ -554,9 +554,8 @@ def mainWindow():
 					falling.changeZone()
 
 		pygame.display.update()
-		time.sleep(.2)
+		time.sleep(fallingSpeed())
 		falling, next_block = checkColission(falling, zones, next_block);	#Fall piece
 		checkForScore(zones)
-		print(SCORE)
 
 mainWindow()
