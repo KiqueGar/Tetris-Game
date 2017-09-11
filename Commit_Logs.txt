@@ -1,0 +1,287 @@
+commit 5f54f5995a49ed809a2e299812ca63da65b511d5
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Mon Sep 11 02:22:53 2017 -0500
+
+    Feat: Game instructions
+    
+    - Displays instructions for playing
+    - Edited window area
+    - Changes to colors
+    - Wait 2 seconds before closing after Game Over
+
+commit 83b4fda443247d3abbfa1b376ab51a62e7586a94
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Mon Sep 11 00:09:01 2017 -0500
+
+    Doc: Adds environment file
+
+commit 3f75e76539f6d2f359d35af4490f8ba7b24d6679
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Mon Sep 11 00:07:49 2017 -0500
+
+    Feat: Prohibits change if zone is not free
+    
+    - Adds details to documentation
+
+commit 05f5d9f84863366fda9987ab95f5dd02708f5b87
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Sun Sep 10 23:31:08 2017 -0500
+
+    Feat: Building executable
+    
+    - Falling speed now depends on score
+    - Adds documentation
+
+commit 9b128da4d4805003005f74a6a02066f44c28e2de
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Sun Sep 10 19:43:43 2017 -0500
+
+    Doc: Correct Line Beheavior
+
+commit 6fd1d510b76b3791ffe370fb069db54c91366644
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Sun Sep 10 19:42:47 2017 -0500
+
+    Feat: Correct line beheavior
+    
+    - Corrects previous bug of non deleting if no outliers
+
+commit 63e64a14c5d95dc5bff4a9975d802bd84e89e8aa
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Sun Sep 10 19:16:02 2017 -0500
+
+    Feat: Delete penalties and roll down whats above them
+    
+    - Creates fallAfterDelete and deleteExternal functions to gameZone class
+    - Recursive checkForScore()
+    - BUG: No score calculation if no outliers
+
+commit de52af43fe1e1f16dcd1c2f65d8f87c796c4d281
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Sun Sep 10 17:06:20 2017 -0500
+
+    Doc: Update outliers
+
+commit 93b85199b2fe77794b126c4eaf0cc8f7a074ef5b
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Sun Sep 10 17:03:25 2017 -0500
+
+    Feat: Update outliers
+    
+    - Creates a updateExternals function of gameZone class
+    - Outliers doesn't complete a line nor give false negatives
+
+commit a921453427b79d0e8c71b1fd8649b5a318c39be3
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Sun Sep 10 14:31:01 2017 -0500
+
+    Doc: Update after "No removal of line if outliers present"
+
+commit 1cf3b25de304a2cc93fee98ed98020ba0dca8a45
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Sun Sep 10 14:27:17 2017 -0500
+
+    Feat: No removal of line if outliers present
+    
+    - Changes keys of movement from ENTER to right_ALT, right_CTRL
+    - BUG: checkForOutliers function is missing recalculation of ouliers
+
+commit daca374bc3090581705201808097eab5788d5b81
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Sun Sep 10 12:05:33 2017 -0500
+
+    Feat: Text rendering of score and next piece
+    
+    - Renders text
+    - Corrects bug in trying to rotate an empty list in checkForScore
+
+commit 8a1494d05cf257315ff73e972c2851e966cdb9bb
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Sun Sep 10 10:46:06 2017 -0500
+
+    Feat: Outliers generation
+    
+    - Generates outliers
+    - Mofifies addBlockToZone function to account for above
+    - Uses color definition for gameZones
+
+commit 43df854238618eadfe59a27d7464d7f41a97d848
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Sun Sep 10 02:09:52 2017 -0500
+
+    Feat: Corrects bad rendering of falling block
+
+commit 7dd509559310a28374e80fe957e6bfba1346d16e
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Sat Sep 9 20:01:34 2017 -0500
+
+    Feat: Line clearing when complete
+    
+    - BUG: bad rendering of n lines at top, where n is deleted lines
+    - Creates checkForScore function to delete completed lines and increment score (not yet implemented)
+
+commit 9f0d8ba3c087381e0447baa4a3eb4f90d65b57a0
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Sat Sep 9 11:45:28 2017 -0500
+
+    Feat: Adds CONSOLE_OUTPUT flag for debbug printing
+
+commit 7090e6e5987a159004e323f643f4f30c921cc353
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Sat Sep 9 10:35:07 2017 -0500
+
+    Feat: Rolls over next_block as falling
+    
+    - Changes checkColission for rolling next block
+
+commit d26463578282471f0633e2a758128f3cf1324c6b
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Sat Sep 9 09:55:29 2017 -0500
+
+    Doc: TODO update
+
+commit d9df75710abcba8ff219bfdcb9ed47ad9f904404
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Sat Sep 9 09:52:20 2017 -0500
+
+    Feat: Render next falling piece
+    
+    - Not actually rolling into next piece
+    - Adds collisioned object as filled in gamezone space
+    - Game Over! (Closes at condition, might change in the future)
+
+commit 4d1db1ca89c787040029fec501ae2cc7d31d70ed
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Fri Sep 8 22:11:16 2017 -0500
+
+    Feat: Adds falled object to fixed space
+    
+    - Adds filled_spaces to gameZone class for line making (not implemented)
+    - Adds color to gameZone class for outlier detection (not implemented)
+    - Adds externals to gameZone to keep track of outliers
+    - Mistype in color at drawMatrix
+    - addBlockToZone implementation
+    - Adds Comments
+
+commit d5dd1f10cfec8be0026ca40cbd8b177ad6776dd8
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Fri Sep 8 20:46:28 2017 -0500
+
+    Feat: Colission detection
+    
+    - Changes falling beheavior to check for collition first
+
+commit 2f2d7d00b76ef21a95c445f5bf8ad50a0a1c0ac5
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Thu Sep 7 23:19:33 2017 -0500
+
+    Feat: Move only inside of bounds
+    
+    - Creates addBlockToZone function, not complete
+    - Creates isValidMove function to evaluate colissions and inside bounds
+    - Key events changed to account for above
+
+commit 1320a597fcc1499438fe76b905726b167338b94f
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Wed Sep 6 23:52:21 2017 -0500
+
+    Feat: Detection of out of bounds
+    
+    - Adds listing of nonzero cells
+    - Changes Overlay function using above
+
+commit 5bb1ca90e8bb0528521ea047e14a76a7052cd92e
+Author: Enrique Garcia <enrique.garcia@blackecco.com>
+Date:   Wed Sep 6 18:13:04 2017 -0500
+
+    Feat: Move sideways
+    
+    -Moves pieces sideways
+    - Auto fall piece on start
+
+commit 46b223c7cc22eb8c3c31da422d86e0938fbadc50
+Author: Enrique Garcia <enrique.garcia@blackecco.com>
+Date:   Wed Sep 6 17:50:46 2017 -0500
+
+    Doc: Update TODO.txt
+
+commit 4905ccae66dc552a626f808fe0b3261a9ae52c53
+Author: Enrique Garcia <enrique.garcia@blackecco.com>
+Date:   Wed Sep 6 17:45:27 2017 -0500
+
+    Feat: Cahnge Game zones
+    
+    - Allows falling block changes between game zones
+    - Block rotation!
+    - Create new block on start
+
+commit 01432de5b56c775f6f0ee1fc70faa2a999b7eb28
+Author: Enrique Garcia <enrique.garcia@blackecco.com>
+Date:   Wed Sep 6 13:26:11 2017 -0500
+
+    Feat: Changes gamezones to objects
+    
+    - Creates gameZone Object
+    - Creates 3 games zones
+    - Adds FALLING_OBJECT variable for falling block
+
+commit 97cae86700da4b1580bfcdd9c32192c61610d933
+Author: Enrique Garcia <enrique.garcia@blackecco.com>
+Date:   Wed Sep 6 12:11:14 2017 -0500
+
+    Feat: Creation of blocks
+    
+    - Create random block function
+    - Adds rotation and falling
+    - Adds color definition
+
+commit 46c67fea25724da4558877b53fcfa74c3c948451
+Author: Enrique Garcia <enrique.garcia@blackecco.com>
+Date:   Tue Sep 5 17:55:00 2017 -0500
+
+    Feat: Defines shapes and names
+    
+    - Adds falling_block object
+
+commit c099e5466d2c9a59c264cca516e54aa0f150dd18
+Author: Enrique Garcia <enrique.garcia@blackecco.com>
+Date:   Tue Sep 5 17:05:27 2017 -0500
+
+    Feat: Renders gameboard
+    
+    - Changes joinMatrix function
+    - Renders game zones walls
+    - Cleanup
+    - Add Comments
+
+commit 9369615f9e7517b2954d06bf150e2b13b0447350
+Author: Enrique Garcia <enrique.garcia@blackecco.com>
+Date:   Tue Sep 5 16:22:22 2017 -0500
+
+    Feat: Draws some canvas
+    
+    - Draws simple lines separating zones
+    - Some update on README
+
+commit 733ce4e9d1280a5b9ce77f97460c57271feb80be
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Tue Sep 5 08:25:21 2017 -0500
+
+    Style: Cleanup
+    
+    - Adds TODO list
+
+commit 7f34304b5c01d52c8d501cd409a3b0a23e4b36df
+Author: Enrique Garcia <enrique.garcis@gmail.com>
+Date:   Mon Sep 4 22:04:12 2017 -0500
+
+    Feat: Creates window
+    
+    - Renders window only, no objects, no grid yet
+    - Defines matrix to serve as container of blocks
+
+commit 7c6220a9753cbe734f026002b363a382140fa414
+Author: Enrique Garcia <enriquegarcis@gmail.com>
+Date:   Mon Sep 4 13:37:37 2017 -0500
+
+    Initial commit
