@@ -5,8 +5,9 @@ from pygame.locals import*
 import random
 
 pygame.font.init()		# Load font module and font to use
-myfont = pygame.font.SysFont("Comic Sans MS", 15)
-scorefont = pygame.font.SysFont("Comic Sans MS", 45)
+myfont = pygame.font.SysFont("Arial", 15)
+scorefont = pygame.font.SysFont("Arial", 45)
+gameOverfont = pygame.font.SysFont("Comic Sans MS", 15)
 
 
 #Canvas properties
@@ -20,6 +21,7 @@ EMPTY_LINE = []
 
 SCORE =0
 score_surface = scorefont.render("{0}".format(SCORE), 1, (255,255,255))
+gameOver_surface = gameOverfont.render("GAME OVER", 1, (0,0,255))
 #Build bottom/top walls
 for i in range(3*(2*SIDE_OFFSET + ZONE_WIDTH)):
 	OFFSET.append(99)
@@ -27,9 +29,9 @@ for i in range(3*(2*SIDE_OFFSET + ZONE_WIDTH)):
 for i in range(ZONE_WIDTH):
 	EMPTY_LINE.append(0)
 #Color definitions
-BLUE = [66,154,223]
+BLUE = [0,191,255]
 RED = [205, 30, 16]
-YELLOW =[241,171,0]
+YELLOW =[255,255,0]
 COLORS=[BLUE, RED, YELLOW]
 #Pieces Definition
 SHAPE_T = [[0,0,0,0,0], [0,1,1,1,0], [0,0,1,0,0], [0,0,0,0,0], [0,0,0,0,0]]
@@ -489,18 +491,20 @@ def blockStatus(block):
 
 def gameOver():
 	global GAME_ALIVE
-	GAME_ALIVE = False
 	print("Game Over!!")
+	GAME_ALIVE = False
 
 def renderText(window, text, x=0, y=0):
 	"""Render text"""
 	text_render = myfont.render(text, 1, (255,255,255))
 	window.blit(text_render,(x,y))
 	window.blit(score_surface,(625,150))
+	window.blit(gameOver_surface,(200,600))
 
 def mainWindow():
 	global FALLING_OBJECT
-	window = pygame.display.set_mode((800,600))
+	window = pygame.display.set_mode((750,485))
+	pygame.display.set_caption("Tri-Tetris")
 	zones=createZones();	#Create Board to play in
 	falling = None
 	
@@ -516,7 +520,15 @@ def mainWindow():
 		else: drawMatrix(window, toRender, RED)
 		drawNext(window, next_block)
 		renderText(window, "Next Block", 600, 0)
-		
+		renderText(window, "Controls:", 540,250)
+		renderText(window, "- Use Arrows to move", 550,270)
+		renderText(window, "- Left CTRL and Left ALT", 550,290)
+		renderText(window, "  changes zones Try it!", 550,310)
+		renderText(window, "Tips:", 540,350)
+		renderText(window, "- Keep the same color per zone", 550,370)
+		renderText(window, "  (Penalties doesn´t count)", 550,390)
+		renderText(window, "- Penalties are removed on scoring", 550,410)
+		renderText(window, "Try to score above 35   :)", 560,450)
 		for events in pygame.event.get():
 			if events.type == QUIT:
 				pygame.quit()
@@ -564,5 +576,6 @@ def mainWindow():
 		time.sleep(fallingSpeed())
 		falling, next_block = checkColission(falling, zones, next_block);	#Fall piece
 		checkForScore(zones)
+	time.sleep(2)
 
 mainWindow()
