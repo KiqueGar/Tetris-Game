@@ -25,7 +25,7 @@
 	[ ] Game Over
 [x] Outliers generation
 [x] Change speed acording to score
-[ ] Add conda env to documentation
+[x] Add conda env to documentation
 [x] Generate .EXE
 [ ] 
 [ ] 
