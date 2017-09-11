@@ -386,6 +386,11 @@ def isValidMove(indexes, x_init, y_init, space):
 		else: return False
 	return True
 
+def isValidChange(zones, falling_block, number):
+	"""Check if change between zones is valid"""
+	zone = zones[(falling_block.zone+number)%3]
+	return isValidMove(falling_block.indexes, falling_block.x, falling_block.y, zone.space) 
+	
 def checkColission(falling_block, zones, next_block):
 	"""Check for collition, append to zone if true, fall if not"""
 	zone = falling_block.zone 		# Get space zone to operate
@@ -547,11 +552,13 @@ def mainWindow():
 					#checkForScore(zones)
 				if events.key==K_LCTRL:
 					#print("Left CTRL")
-					falling.changeZone()
-					falling.changeZone()
+					if isValidChange(zones, falling, 2):
+						falling.changeZone()
+						falling.changeZone()
 				if events.key==K_LALT:
 					#print("Left Alt")
-					falling.changeZone()
+					if isValidChange(zones, falling, 1):
+						falling.changeZone()
 
 		pygame.display.update()
 		time.sleep(fallingSpeed())
