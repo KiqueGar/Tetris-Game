@@ -443,8 +443,9 @@ def checkForScore(zones):
 				if counter == ZONE_WIDTH -1:
 					completed_lines.append(row)
 					if CONSOLE_DEBUG: print("Possible line in ROW %i"%row)
-			#valid_lines = completed_lines			# Check and discard lines of outliers
-			if len(zone.externals)>0: valid_lines = checkForOutliers(completed_lines, zone.externals)
+			if len(zone.externals)>0:			# Check and discard lines of outliers
+				valid_lines = checkForOutliers(completed_lines, zone.externals)
+			else: valid_lines = completed_lines			
 			if valid_lines != None:
 				for line in valid_lines:			# Remove valid lines, replace with empty ones at top
 					del zone.space[line]
@@ -455,7 +456,6 @@ def checkForScore(zones):
 					SCORE += 1
 					removePenalty(zones, SCORE)	# Remove an outlier
 					score_surface = scorefont.render("{0}".format(SCORE), 1, (255,255,255))
-					checkForScore(zones)
 				zone.getIndexes()
 				zone.updateExternals()
 				zone.rotate()
