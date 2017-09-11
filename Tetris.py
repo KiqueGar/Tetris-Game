@@ -126,11 +126,37 @@ class gameZone(object):
 		else:
 			self.externals = copy.deepcopy(outliers)
 
-	
 	def rotate(self):
 		"""Rotates space slicing"""
 		rotated = list(zip(*self.filled_spaces[::-1]))
 		self.filled_rotated = rotated
+
+	def fallAfterDelete(self, coordinate):
+		"""Falls column after deleting element at coordinate"""
+		for i in range(coordinate[0],0,-1):		#Iterate backwards from removed item
+			upper=self.space[i-1][coordinate[1]]
+			if upper !=0:						#If upper block exist
+				self.space[i][coordinate[1]] = upper
+			else:
+				print("Interrupting at row: ", i)
+				self.space[i][coordinate[1]] = upper
+				break
+				
+		self.getIndexes()
+		self.rotate()
+		self.updateExternals()
+		print("Rolled down!")
+
+	def deleteExternal(self):
+		"""Delete an external from space"""
+		element = random.randint(0, len(self.externals)-1)
+		outlier = self.externals[element]
+		print("deleting: ", outlier)
+		self.space[outlier[0]][outlier[1]]=0
+		self.fallAfterDelete(outlier)
+		#self.getIndexes()
+		#self.rotate()
+		#self.updateExternals()
 
 def createZones():
 	"""Creates 3 gameZone objects, return them in array"""
@@ -175,7 +201,7 @@ def createMatrix(n,m):
 def joinMatrix(matrix1, matrix2, matrix3):
 	"""Appends gamezones, inserts separators between zones"""
 	if (len(matrix1)!=len(matrix2) or len(matrix1)!=len(matrix3)):
-		print ("joinMatrix: Matrices must be of same height!")
+		if CONSOLE_DEBUG: print ("joinMatrix: Matrices must be of same height!")
 		return matrix1
 	new_matrix=[]
 	for i in range(len(matrix1)):
@@ -269,7 +295,7 @@ def addBlockToZone(falling_block, zones):
 			y = y_init + index[1]
 			game_space[x][y]=filler 		#Fill space with previous block
 	else: 
-		print("Not correct zone! Penalty!")
+		if CONSOLE_DEBUG: print("Not correct zone! Penalty!")
 		i=0							# Add 2 squares to this zone, one to each other zone
 		for index in reversed(falling_block.indexes):
 			i+=1
@@ -317,6 +343,29 @@ def addPenalty(zones, falling_block, number):
 	zone.rotate()
 	print(zone.filled_spaces)
 	
+def removePenalty(zones, seed):
+	"""Removes a penalty from zone (if exist), attemps 2 times"""
+	index=seed%3							#Check if zone has outliers, if not, try again
+	if zoneHasExternals(zones[index]):
+		zone=zones[index]					#Delete external
+		zone.deleteExternal()
+	else:
+		"""
+		if zoneHasExternals(zones[(index+1)]%3):
+			#Delete external, second attempt
+			pass
+		else: return						#If second attempt didn´t work, do nothing
+		"""
+		return
+
+def zoneHasExternals(zone):
+	"""Test if zone has outliers on it"""
+	if len(zone.externals)>0:
+		#print("Zone has externals!")
+		return True
+	return False
+
+
 def find_element_in_list(element, list_element):
     try:
         index_element = list_element.index(element)
@@ -360,7 +409,7 @@ def checkColission(falling_block, zones, next_block):
 def checkForOutliers(lines, outliers_list):
 	valid_lines=[]
 	outlier_line=[]				# Get lines of outliners
-	print("Checking for outliers")
+	if CONSOLE_DEBUG: print("Checking for outliers")
 	for outlier in outliers_list:
 		outlier_line.append(outlier[0])
 	if lines == None:				#If no lines yet, do nothing
@@ -369,12 +418,11 @@ def checkForOutliers(lines, outliers_list):
 		if find_element_in_list(line, outlier_line) == None:
 			valid_lines.append(line)
 		else:
-			print("checkForOutliers: Line has outlier! Not removing")
+			if CONSOLE_DEBUG: print("checkForOutliers: Line has outlier! Not removing")
 	if len(valid_lines)<1:
 		return None
 	else:
 		return valid_lines
-
 
 def checkForScore(zones):
 	"""Evaluates zones for completed lines"""
@@ -394,7 +442,7 @@ def checkForScore(zones):
 					last_row = row
 				if counter == ZONE_WIDTH -1:
 					completed_lines.append(row)
-					print("Possible line in ROW %i"%row)
+					if CONSOLE_DEBUG: print("Possible line in ROW %i"%row)
 			#valid_lines = completed_lines			# Check and discard lines of outliers
 			if len(zone.externals)>0: valid_lines = checkForOutliers(completed_lines, zone.externals)
 			if valid_lines != None:
@@ -405,7 +453,9 @@ def checkForScore(zones):
 					global SCORE
 					global score_surface
 					SCORE += 1
+					removePenalty(zones, SCORE)	# Remove an outlier
 					score_surface = scorefont.render("{0}".format(SCORE), 1, (255,255,255))
+					checkForScore(zones)
 				zone.getIndexes()
 				zone.updateExternals()
 				zone.rotate()
@@ -468,7 +518,7 @@ def mainWindow():
 				sys.exit()
 			elif events.type == KEYDOWN:
 				if events.key==K_UP:
-					print ("^")
+					#print ("^")
 					future_block=copy.deepcopy(falling)	#Create a copy of block
 					future_block.rotate()
 					if isValidMove(future_block.indexes, future_block.x, future_block.y, zones[future_block.zone].space):
@@ -478,28 +528,29 @@ def mainWindow():
 					del future_block
 						
 				if events.key==K_LEFT:
-					print ("<")
+					#print ("<")
 					if isValidMove(falling.indexes, falling.x, falling.y-1, zones[falling.zone].space):
 						falling.move(-1)
 						drawMatrix(window, toRender, falling.color)
 						if CONSOLE_DEBUG: blockStatus(falling)
 				if events.key==K_RIGHT:
-					print (">")
+					#print (">")
 					if isValidMove(falling.indexes, falling.x, falling.y+1, zones[falling.zone].space):
 						falling.move(1)	
 						if CONSOLE_DEBUG: blockStatus(falling)
 				if events.key==K_RETURN:
-					print ("ENTER")
+					#print ("ENTER")
+					pass
 				if events.key==K_DOWN:
-					print ("v")
+					#print ("v")
 					falling, next_block = checkColission(falling, zones, next_block)
 					#checkForScore(zones)
 				if events.key==K_LCTRL:
-					print("Left CTRL")
+					#print("Left CTRL")
 					falling.changeZone()
 					falling.changeZone()
 				if events.key==K_LALT:
-					print("Left Alt")
+					#print("Left Alt")
 					falling.changeZone()
 
 		pygame.display.update()

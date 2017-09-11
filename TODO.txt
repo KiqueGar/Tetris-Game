@@ -17,13 +17,14 @@
 	[ ] Don´t close at Game Over
 [x] Remove completed row
 	[x] Do not remove if not same color
-	[ ] Remove penalties
-	[ ] Fall pieces down
+	[x] Remove penalties
+	[x] Fall pieces down
 [x] Show text
 	[x] Next piece
 	[x] Show Score
 	[ ] Game Over
 [x] Outliers generation
+[ ] Change speed acording to score
 [ ] Add conda env to documentation
 [ ] Generate .EXE
 [ ] 
