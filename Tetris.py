@@ -46,6 +46,7 @@ SHAPES = [SHAPE_T, SHAPE_S, SHAPE_Z, SHAPE_J, SHAPE_L, SHAPE_O, SHAPE_I]
 NAMES = ['T', 'S', 'Z', 'J', 'L', 'O', 'I']
 
 FALLING_OBJECT=False
+FALLING_CPU = False
 GAME_ALIVE = True
 CONSOLE_DEBUG = False
 
@@ -187,6 +188,7 @@ def rollNext(next_block):
 	next_block = create_block()		#Generate next Block
 	falling.getIndexes()
 	return falling, next_block
+
 
 def createMatrix(n,m):
 	"""Creates matrix to be used as container of blocks"""
@@ -482,6 +484,11 @@ def checkForScore(zones):
 				zone.getIndexes()
 				zone.updateExternals()
 				zone.rotate()
+	global FALLING_CPU
+	if FALLING_CPU == False:			#Start CPU player after first row
+		if SCORE > 1:
+			FALLING_CPU = True
+			print("Starting CPU")
 
 def fallingSpeed():
 	"""Returns interval between blocks as function of score"""
@@ -571,6 +578,88 @@ def mapMousePos(pos):
 		#print("No valid area!")
 		return None, None
 
+def zoneCost(zones, block):
+	"""Cost of being in zone"""
+	cost = 100						# Maximum cost of bad zone
+	color = block.color 				# Current block color
+	currentZone=block.zone 				# Current location
+	if zones[currentZone].color == None:	# If no color assigned to Zone, zone is Ok
+		#print("Entering empty color zone")
+		return 0
+	if zones[currentZone].color != color:	# If zone color is not block color, return cost
+		return cost
+	else:
+		#print("Maching color zone and block")
+		return 0 # If color matches, no cost of being here
+
+def calculateCosts(zones, future_block):
+	"""Calculates cost of possible action"""
+	cumulative = int(0)
+	cumulative += zoneCost(zones, future_block)
+
+	return cumulative
+
+def CPUMove(zones, block):
+	"""Makes a move for the CPU block"""
+	ultimate_cost = int(1e10)
+	policy = []						# Holder for costs at each move
+									#Cost of staying
+	stay_block = copy.deepcopy(block)
+	print("CPUMove: Stay")
+	cost = calculateCosts(zones, stay_block)
+	policy.append(cost)
+									#Cost of rotate
+	rot_block = copy.deepcopy(block)		#Check if rotation is posible
+	print("CPUMove: Rotate")
+	rot_block.rotate()					
+	if isValidMove(rot_block.indexes, rot_block.x, rot_block.y, zones[rot_block.zone].space):
+		cost = calculateCosts(zones, stay_block)
+		policy.append(cost)
+	else:							#If rotation not possible, append max cost
+		policy.append(ultimate_cost)
+									#Cost of left
+	left_block = copy.deepcopy(block)		# If move is valid, do and check for cost
+	print("CPUMove: Move Left")
+	if isValidMove(left_block.indexes, left_block.x, left_block.y-1, zones[left_block.zone].space):
+		left_block.move(-1)
+		cost = calculateCosts(zones, left_block)
+		policy.append(cost)
+	else:
+		policy.append(ultimate_cost)		# If left not possible, append max cost
+									# Cost of moving right
+	right_block = copy.deepcopy(block)		# If move is valid, do and check for cost
+	print("CPUMove: Move Right")
+	if isValidMove(right_block.indexes, right_block.x, right_block.y+1, zones[right_block.zone].space):
+		right_block.move(+1)
+		cost = calculateCosts(zones, right_block)
+		policy.append(cost)
+	else:
+		policy.append(ultimate_cost) 		# If left not possible, append max cost
+									# Cost of changing zone left
+	l_sh_block = copy.deepcopy(block)		# If change is valid, do and return cost
+	print("CPUMove: Shift Left")
+	if isValidChange(zones, l_sh_block, 2):
+		l_sh_block.changeZone()
+		l_sh_block.changeZone()
+		cost = calculateCosts(zones, l_sh_block)
+		policy.append(cost)
+	else:							# If left shift not possible, append max cost
+		policy.append(ultimate_cost)
+									#Cost of shifting right
+	r_sh_block = copy.deepcopy(block)		# If change is valid, do and return cost
+	print("CPUMove: Shift Right")
+	if isValidChange(zones, r_sh_block, 1):
+		r_sh_block.changeZone()
+		cost = calculateCosts(zones, r_sh_block)
+		policy.append(cost)
+	else:
+		policy.append(ultimate_cost)
+
+	
+	print(policy)	
+	return
+
+
 
 
 
@@ -583,7 +672,11 @@ def mainWindow():
 	
 	next_block = create_block()				#Create new block: Game Start
 	falling, next_block = rollNext(next_block)	# Get next block
+	next_cpu_block = create_block()			# Create new CPU block
+	cpu_block, next_cpu_block = rollNext(next_cpu_block)			# Get CPU next block 
+	cpu_block.zone=0
 	FALLING_OBJECT = True
+
 	if CONSOLE_DEBUG: blockStatus(falling)
 
 	while GAME_ALIVE:
@@ -619,7 +712,7 @@ def mainWindow():
 					clearRedraw(window, falling, zones, next_block)
 				if events.key==K_RETURN:
 					#print ("ENTER")
-					pass
+					CPUMove(zones, falling)
 				if events.key==K_DOWN:
 					#print ("v")
 					falling, next_block = checkColission(falling, zones, next_block)
@@ -636,13 +729,16 @@ def mainWindow():
 					if isValidChange(zones, falling, 1):
 						falling.changeZone()
 					clearRedraw(window, falling, zones, next_block)
+				if events.key == K_s:
+					global SCORE
+					SCORE += 1
 			elif events.type == pygame.MOUSEBUTTONUP:
 				raw_pos = pygame.mouse.get_pos()	#Read mouse posiion and map to game zone
 				delete_from_zone, sup_outlier = mapMousePos(raw_pos)
 				if delete_from_zone != None:		#Delete penalty if exists
 					cancelPenalty(zones[delete_from_zone], sup_outlier)
 					clearRedraw(window, falling, zones, next_block)
-
+					checkForScore(zones)
 		pygame.display.update()
 		time.sleep(fallingSpeed())
 		falling, next_block = checkColission(falling, zones, next_block);	#Fall piece

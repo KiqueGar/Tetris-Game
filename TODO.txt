@@ -31,6 +31,10 @@
 [x] When click, turn penalty to correct color
 	[x] Map click position
 	[x] Check if in penalty and delete
+[ ] CPU plays on same boards
+	[ ] Aims to maximize player score
+	[ ] No colission
+	[ ] Destination?
 
 
 Examples:

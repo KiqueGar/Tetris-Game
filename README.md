@@ -38,6 +38,7 @@ This dll should be fine, however, if problems arise, please copy from your envir
 ## Known bugs
 - Zone color is assigned as the first falling block appends to its zone, therefore,
 it is possible to have the same color in more than 1 zone.
+- Sometimes a line fails to score after canceling penalties of no other penalties exist
 
 
 ## Future implementations
