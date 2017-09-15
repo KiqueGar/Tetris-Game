@@ -581,6 +581,9 @@ def mainWindow():
 					if isValidChange(zones, falling, 1):
 						falling.changeZone()
 					clearRedraw(window, falling, zones, next_block)
+			elif events.type == pygame.MOUSEBUTTONUP:
+				print("Mouse Possition: ")
+				print(pygame.mouse.get_pos())
 
 		pygame.display.update()
 		time.sleep(fallingSpeed())

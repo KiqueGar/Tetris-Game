@@ -27,8 +27,8 @@
 [x] Change speed acording to score
 [x] Add conda env to documentation
 [x] Generate .EXE
-[ ] 
-[ ] 
+[x] No Lag on Movement
+[ ] When click, turn penalty to correct color 
 [ ] 
 
 
