@@ -501,6 +501,24 @@ def renderText(window, text, x=0, y=0):
 	window.blit(score_surface,(625,150))
 	window.blit(gameOver_surface,(200,600))
 
+def clearRedraw(window, falling, zones, next_block):
+	"""Clears screen and draws game"""
+	window.fill((0,0,0))		
+	toRender = evaluateGame(falling, zones)
+	if FALLING_OBJECT: drawMatrix(window, toRender, falling.color)
+	else: drawMatrix(window, toRender, RED)
+	drawNext(window, next_block)
+	renderText(window, "Next Block", 600, 0)
+	renderText(window, "Controls:", 540,250)
+	renderText(window, "- Use Arrows to move", 550,270)
+	renderText(window, "- Left CTRL and Left ALT", 550,290)
+	renderText(window, "  changes zones Try it!", 550,310)
+	renderText(window, "Tips:", 540,350)
+	renderText(window, "- Keep the same color per zone", 550,370)
+	renderText(window, "  (Penalties doesn´t count)", 550,390)
+	renderText(window, "- Penalties are removed on scoring", 550,410)
+	renderText(window, "Try to score above 35   :)", 560,450)
+
 def mainWindow():
 	global FALLING_OBJECT
 	window = pygame.display.set_mode((750,485))
@@ -514,21 +532,7 @@ def mainWindow():
 	if CONSOLE_DEBUG: blockStatus(falling)
 
 	while GAME_ALIVE:
-		window.fill((0,0,0))		
-		toRender = evaluateGame(falling, zones)
-		if FALLING_OBJECT: drawMatrix(window, toRender, falling.color)
-		else: drawMatrix(window, toRender, RED)
-		drawNext(window, next_block)
-		renderText(window, "Next Block", 600, 0)
-		renderText(window, "Controls:", 540,250)
-		renderText(window, "- Use Arrows to move", 550,270)
-		renderText(window, "- Left CTRL and Left ALT", 550,290)
-		renderText(window, "  changes zones Try it!", 550,310)
-		renderText(window, "Tips:", 540,350)
-		renderText(window, "- Keep the same color per zone", 550,370)
-		renderText(window, "  (Penalties doesn´t count)", 550,390)
-		renderText(window, "- Penalties are removed on scoring", 550,410)
-		renderText(window, "Try to score above 35   :)", 560,450)
+		clearRedraw(window, falling, zones, next_block)
 		for events in pygame.event.get():
 			if events.type == QUIT:
 				pygame.quit()
@@ -541,6 +545,8 @@ def mainWindow():
 					if isValidMove(future_block.indexes, future_block.x, future_block.y, zones[future_block.zone].space):
 						falling.rotate()
 						if CONSOLE_DEBUG: blockStatus(falling)
+					
+					clearRedraw(window, falling, zones, next_block)
 					#else: print("No change! Interference")
 					del future_block
 						
@@ -548,13 +554,14 @@ def mainWindow():
 					#print ("<")
 					if isValidMove(falling.indexes, falling.x, falling.y-1, zones[falling.zone].space):
 						falling.move(-1)
-						drawMatrix(window, toRender, falling.color)
 						if CONSOLE_DEBUG: blockStatus(falling)
+					clearRedraw(window, falling, zones, next_block)
 				if events.key==K_RIGHT:
 					#print (">")
 					if isValidMove(falling.indexes, falling.x, falling.y+1, zones[falling.zone].space):
 						falling.move(1)	
 						if CONSOLE_DEBUG: blockStatus(falling)
+					clearRedraw(window, falling, zones, next_block)
 				if events.key==K_RETURN:
 					#print ("ENTER")
 					pass
@@ -562,15 +569,18 @@ def mainWindow():
 					#print ("v")
 					falling, next_block = checkColission(falling, zones, next_block)
 					#checkForScore(zones)
+					clearRedraw(window, falling, zones, next_block)
 				if events.key==K_LCTRL:
 					#print("Left CTRL")
 					if isValidChange(zones, falling, 2):
 						falling.changeZone()
 						falling.changeZone()
+					clearRedraw(window, falling, zones, next_block)
 				if events.key==K_LALT:
 					#print("Left Alt")
 					if isValidChange(zones, falling, 1):
 						falling.changeZone()
+					clearRedraw(window, falling, zones, next_block)
 
 		pygame.display.update()
 		time.sleep(fallingSpeed())
