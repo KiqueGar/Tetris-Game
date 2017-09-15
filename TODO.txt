@@ -28,9 +28,9 @@
 [x] Add conda env to documentation
 [x] Generate .EXE
 [x] No Lag on Movement
-[ ] When click, turn penalty to correct color
-	[ ] Map click position
-	[ ] Check if in penalty and delete
+[x] When click, turn penalty to correct color
+	[x] Map click position
+	[x] Check if in penalty and delete
 
 
 Examples:

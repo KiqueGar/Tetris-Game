@@ -356,6 +356,26 @@ def removePenalty(zones, seed):
 		"""
 		return
 
+def cancelPenalty(zone, position):
+	"""Cancels a penalty and converts it to right color in zone"""
+	if zone.color == None: return 	#If zone has no color yet, do nothing
+	work_space = zone.space 			#Read current space
+	outlier_list = zone.externals
+	if find_element_in_list(position, outlier_list) == None:
+		if CONSOLE_DEBUG: print("No outlier here!")	#If no outlier, do nothing
+		return
+	else:						#If outlier there, replace
+		color = zone.color 			#Get correct color
+		if color == BLUE: filler = 10
+		elif color == RED: filler = 20
+		elif color == YELLOW: filler = 30
+		work_space[position[0]][position[1]]=filler
+		zone.getIndexes()
+		zone.updateExternals()
+		return
+
+
+
 def zoneHasExternals(zone):
 	"""Test if zone has outliers on it"""
 	if len(zone.externals)>0:
@@ -616,8 +636,11 @@ def mainWindow():
 						falling.changeZone()
 					clearRedraw(window, falling, zones, next_block)
 			elif events.type == pygame.MOUSEBUTTONUP:
-				raw_pos = pygame.mouse.get_pos()
-				print(mapMousePos(raw_pos))
+				raw_pos = pygame.mouse.get_pos()	#Read mouse posiion and map to game zone
+				delete_from_zone, sup_outlier = mapMousePos(raw_pos)
+				if delete_from_zone != None:		#Delete penalty if exists
+					cancelPenalty(zones[delete_from_zone], sup_outlier)
+					clearRedraw(window, falling, zones, next_block)
 
 		pygame.display.update()
 		time.sleep(fallingSpeed())
