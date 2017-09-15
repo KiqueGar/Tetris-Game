@@ -519,6 +519,40 @@ def clearRedraw(window, falling, zones, next_block):
 	renderText(window, "- Penalties are removed on scoring", 550,410)
 	renderText(window, "Try to score above 35   :)", 560,450)
 
+def mapMousePos(pos):
+	"""Maps Mouse position to relevant game zone, returns area an coords"""
+	x_block = int(pos[0]/BLOCK_SIZE)
+	y_block = int(pos[1]/BLOCK_SIZE)
+	#print("Evaluating:", [y_block,x_block])
+	if y_block<SIDE_OFFSET or y_block>ZONE_HEIGHT:	# Trim outside of bounds
+		#print("No valid Zone!, Out of Y")
+		return None, None
+	if x_block<TOP_BOTTOM_OFFSET or x_block>(5*(SIDE_OFFSET) + 3*(ZONE_WIDTH)):
+		#print("No valid Zone! Out of X")
+		return None, None
+	#Area 0
+	if x_block>=SIDE_OFFSET and x_block < ZONE_WIDTH + SIDE_OFFSET:
+		x = y_block- TOP_BOTTOM_OFFSET
+		y = x_block - SIDE_OFFSET
+		return 0, [x,y]
+	#Area 1
+	if x_block>=(3*(SIDE_OFFSET) + ZONE_WIDTH) and x_block<(3*(SIDE_OFFSET) + 2*ZONE_WIDTH):
+		x = y_block - TOP_BOTTOM_OFFSET
+		y = x_block-(3*(SIDE_OFFSET) + ZONE_WIDTH)
+		return 1, [x,y]
+	#Area 2
+	if x_block>=(5*(SIDE_OFFSET) + 2*ZONE_WIDTH) and x_block<(5*(SIDE_OFFSET) + 3*ZONE_WIDTH):
+		x = y_block - TOP_BOTTOM_OFFSET
+		y = x_block-(5*(SIDE_OFFSET) + 2*ZONE_WIDTH)
+		return 2, [x,y]
+	#No other area
+	else:
+		#print("No valid area!")
+		return None, None
+
+
+
+
 def mainWindow():
 	global FALLING_OBJECT
 	window = pygame.display.set_mode((750,485))
@@ -582,8 +616,8 @@ def mainWindow():
 						falling.changeZone()
 					clearRedraw(window, falling, zones, next_block)
 			elif events.type == pygame.MOUSEBUTTONUP:
-				print("Mouse Possition: ")
-				print(pygame.mouse.get_pos())
+				raw_pos = pygame.mouse.get_pos()
+				print(mapMousePos(raw_pos))
 
 		pygame.display.update()
 		time.sleep(fallingSpeed())
