@@ -1,7 +1,7 @@
 # Tetris-Game
 A Tetris game written in python, with a twist
 
-![alt text](.\Preview.PNG "A triple Tetris!")
+![alt text](Preview.PNG "A triple Tetris!")
 ## Setting up
 
 A conda environment is used for development, install conda from [here](https://docs.continuum.io/anaconda/install/windows) 
