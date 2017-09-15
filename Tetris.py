@@ -371,6 +371,7 @@ def cancelPenalty(zone, position):
 		elif color == YELLOW: filler = 30
 		work_space[position[0]][position[1]]=filler
 		zone.getIndexes()
+		zone.rotate()
 		zone.updateExternals()
 		return
 

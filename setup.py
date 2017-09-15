@@ -17,7 +17,7 @@ options = {
 setup(
     name = "Tetris",
     options = options,
-    version = "0.1",
+    version = "0.2",
     description = 'A simple Game',
     executables = executables
 )
