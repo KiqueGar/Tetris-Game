@@ -33,6 +33,10 @@
 	[x] Check if in penalty and delete
 [ ] CPU plays on same boards
 	[ ] Aims to maximize player score
+		[ ] Zone color policy
+		[ ] Current space policy
+			[ ] Max height
+			[ ] Max Outliers
 	[ ] No colission
 	[ ] Destination?
 

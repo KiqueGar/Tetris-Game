@@ -599,45 +599,81 @@ def calculateCosts(zones, future_block):
 
 	return cumulative
 
+def executePolicy(policy, possible_blocks):
+	"""Makes a move based on policy"""
+	NextMove=0
+	lower=policy[0]
+	for i in range(len(policy)):
+		if policy[i]<lower:
+			NextMove = i
+			lower = policy[i]
+
+	if NextMove == 0:
+		print("executePolicy: Don´t Move")
+		return possible_blocks[0]
+	elif NextMove == 1:
+		print("executePolicy: Rotate")
+		return possible_blocks[1]
+	elif NextMove == 2:
+		print("executePolicy: Move Left")
+		return possible_blocks[2]
+	elif NextMove == 3:
+		print("executePolicy: Move Right")
+		return possible_blocks[3]
+	elif NextMove == 4:
+		print("executePolicy: Shift Left")
+		return possible_blocks[4]
+	elif NextMove == 5:
+		print("executePolicy: Shift Right")
+		return possible_blocks[5]
+	else:
+		print("executePolicy: Unkown policy! Staying")
+		return possible_blocks[0]
+
 def CPUMove(zones, block):
 	"""Makes a move for the CPU block"""
 	ultimate_cost = int(1e10)
 	policy = []						# Holder for costs at each move
+	possible_blocks=[]
 									#Cost of staying
 	stay_block = copy.deepcopy(block)
-	print("CPUMove: Stay")
+	if CONSOLE_DEBUG: print("CPUMove: Stay")
 	cost = calculateCosts(zones, stay_block)
 	policy.append(cost)
+	possible_blocks.append(stay_block)		#Append to possible futures
 									#Cost of rotate
 	rot_block = copy.deepcopy(block)		#Check if rotation is posible
-	print("CPUMove: Rotate")
-	rot_block.rotate()					
+	if CONSOLE_DEBUG: print("CPUMove: Rotate")
+	rot_block.rotate()
 	if isValidMove(rot_block.indexes, rot_block.x, rot_block.y, zones[rot_block.zone].space):
 		cost = calculateCosts(zones, stay_block)
 		policy.append(cost)
 	else:							#If rotation not possible, append max cost
 		policy.append(ultimate_cost)
+	possible_blocks.append(rot_block)		#Append to possible futures									
 									#Cost of left
 	left_block = copy.deepcopy(block)		# If move is valid, do and check for cost
-	print("CPUMove: Move Left")
+	if CONSOLE_DEBUG: print("CPUMove: Move Left")
 	if isValidMove(left_block.indexes, left_block.x, left_block.y-1, zones[left_block.zone].space):
 		left_block.move(-1)
 		cost = calculateCosts(zones, left_block)
 		policy.append(cost)
 	else:
 		policy.append(ultimate_cost)		# If left not possible, append max cost
+	possible_blocks.append(left_block)	#Append to possible futures
 									# Cost of moving right
 	right_block = copy.deepcopy(block)		# If move is valid, do and check for cost
-	print("CPUMove: Move Right")
+	if CONSOLE_DEBUG: print("CPUMove: Move Right")
 	if isValidMove(right_block.indexes, right_block.x, right_block.y+1, zones[right_block.zone].space):
 		right_block.move(+1)
 		cost = calculateCosts(zones, right_block)
 		policy.append(cost)
 	else:
 		policy.append(ultimate_cost) 		# If left not possible, append max cost
+	possible_blocks.append(right_block)	#Append to possible futures
 									# Cost of changing zone left
 	l_sh_block = copy.deepcopy(block)		# If change is valid, do and return cost
-	print("CPUMove: Shift Left")
+	if CONSOLE_DEBUG: print("CPUMove: Shift Left")
 	if isValidChange(zones, l_sh_block, 2):
 		l_sh_block.changeZone()
 		l_sh_block.changeZone()
@@ -645,19 +681,20 @@ def CPUMove(zones, block):
 		policy.append(cost)
 	else:							# If left shift not possible, append max cost
 		policy.append(ultimate_cost)
+	possible_blocks.append(l_sh_block)		#Append to possible futures
 									#Cost of shifting right
 	r_sh_block = copy.deepcopy(block)		# If change is valid, do and return cost
-	print("CPUMove: Shift Right")
+	if CONSOLE_DEBUG: print("CPUMove: Shift Right")
 	if isValidChange(zones, r_sh_block, 1):
 		r_sh_block.changeZone()
 		cost = calculateCosts(zones, r_sh_block)
 		policy.append(cost)
 	else:
 		policy.append(ultimate_cost)
-
-	
-	print(policy)	
-	return
+	possible_blocks.append(r_sh_block)	#Append to possible futures
+	print(policy)
+	new_block = executePolicy(policy, possible_blocks)
+	return new_block
 
 
 
@@ -712,7 +749,7 @@ def mainWindow():
 					clearRedraw(window, falling, zones, next_block)
 				if events.key==K_RETURN:
 					#print ("ENTER")
-					CPUMove(zones, falling)
+					falling = CPUMove(zones, falling)
 				if events.key==K_DOWN:
 					#print ("v")
 					falling, next_block = checkColission(falling, zones, next_block)
