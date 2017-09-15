@@ -377,8 +377,6 @@ def cancelPenalty(zone, position):
 		zone.updateExternals()
 		return
 
-
-
 def zoneHasExternals(zone):
 	"""Test if zone has outliers on it"""
 	if len(zone.externals)>0:
@@ -578,6 +576,24 @@ def mapMousePos(pos):
 		#print("No valid area!")
 		return None, None
 
+def imaginaryFall(zones, original_block):
+	"""Falls block until reaches bottom"""
+	future_zones = copy.deepcopy(zones)
+	block = copy.deepcopy(original_block)
+	next_block = None
+	i =0
+	#while (block!=None):		#Check for next 5 falls or block colides
+	for i in range(5):
+		if i >5:
+			break
+		else:
+			if block is falling_block:
+				block, next_block = checkColission(block, future_zones, next_block)
+			else: break
+	return future_zones
+
+
+
 def zoneCost(zones, block):
 	"""Cost of being in zone"""
 	cost = 100						# Maximum cost of bad zone
@@ -592,11 +608,31 @@ def zoneCost(zones, block):
 		#print("Maching color zone and block")
 		return 0 # If color matches, no cost of being here
 
+def heightCosts(zone):
+	"""Costs of column height"""
+	costs = 0
+	if zone.filled_rotated != None:
+		print("Max height: ", zone.filled_rotated[0][0])
+		costs+=zone.filled_rotated[0][0]
+	return costs
+
+
+def externalsCosts(zones):
+	cost=0
+	for zone in zones:
+		if len(zone.externals)>0:
+			cost+=len(zone.externals)
+	#print("Externals cost", cost)
+	return cost
+
 def calculateCosts(zones, future_block):
 	"""Calculates cost of possible action"""
 	cumulative = int(0)
 	cumulative += zoneCost(zones, future_block)
+	new_zones = imaginaryFall(zones, future_block)
 
+	cumulative += externalsCosts(new_zones)
+	cumulative += heightCosts(new_zones[future_block.zone])
 	return cumulative
 
 def executePolicy(policy, possible_blocks):

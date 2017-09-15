@@ -39,7 +39,10 @@ This dll should be fine, however, if problems arise, please copy from your envir
 - Zone color is assigned as the first falling block appends to its zone, therefore,
 it is possible to have the same color in more than 1 zone.
 - Sometimes a line fails to score after canceling penalties of no other penalties exist
-
+- Incorrect calculatino of heightCosts, returning max height of zone, should 
+return max height of column
+- When zones with no color exists, optimum policy defaults to fall into them, even
+if this repeats colors
 
 ## Future implementations
 - Don't close game at Game Over
