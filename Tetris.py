@@ -612,8 +612,8 @@ def heightCosts(zone):
 	"""Costs of column height"""
 	costs = 0
 	if zone.filled_rotated != None:
-		print("Max height: ", zone.filled_rotated[0][0])
-		costs+=zone.filled_rotated[0][0]
+		print("Max height: ", 29 - zone.filled_rotated[0][0])
+		costs+=29 - zone.filled_rotated[0][0]
 	return costs
 
 
