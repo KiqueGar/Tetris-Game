@@ -43,6 +43,7 @@ it is possible to have the same color in more than 1 zone.
 return max height of column
 - When zones with no color exists, optimum policy defaults to fall into them, even
 if this repeats colors
+- imaginaryFall not keeping 
 
 ## Future implementations
 - Don't close game at Game Over
